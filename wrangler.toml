@@ -6,7 +6,7 @@ workers_dev = true
 [[d1_databases]]
 binding = "DB"
 database_name = "memheaven_memory"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "52c7d3b4-e3b2-40cf-8887-bc83cfc724ea"
 
 [[r2_buckets]]
 binding = "MEMORY_BUCKET"
@@ -20,9 +20,9 @@ binding = "VECTORIZE"
 index_name = "memheaven-memory"
 
 [vars]
-OAUTH_ISSUER = "https://memheaven.example.com"
-MCP_RESOURCE = "https://memheaven.example.com/mcp"
-MCP_AUDIENCE = "https://memheaven.example.com/mcp"
+OAUTH_ISSUER = "https://memheaven.xyofn8h7t.workers.dev"
+MCP_RESOURCE = "https://memheaven.xyofn8h7t.workers.dev/mcp"
+MCP_AUDIENCE = "https://memheaven.xyofn8h7t.workers.dev/mcp"
 EMBEDDING_MODEL = "@cf/baai/bge-small-en-v1.5"
 EMBEDDING_DIMENSIONS = "384"
 VECTORIZE_INDEX_NAME = "memheaven-memory"

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MemHeaven</title>
+    <meta
+      name="description"
+      content="Bring MemPalace-style long-term memory to ChatGPT and remote AI agents."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #08101f;
+        --panel: #101a31;
+        --panel-2: #162342;
+        --text: #eef4ff;
+        --muted: #b5c3de;
+        --accent: #70b8ff;
+        --accent-2: #9dffb4;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: linear-gradient(180deg, #08101f, #0c1530 45%, #09111f 100%);
+        color: var(--text);
+      }
+      main {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+      }
+      .hero, section {
+        background: rgba(16, 26, 49, 0.9);
+        border: 1px solid rgba(157, 190, 255, 0.14);
+        border-radius: 24px;
+        padding: 28px;
+        margin-bottom: 20px;
+        backdrop-filter: blur(8px);
+      }
+      h1, h2 { margin: 0 0 12px; }
+      h1 { font-size: clamp(2.2rem, 6vw, 4rem); }
+      h2 { font-size: 1.45rem; }
+      p, li { color: var(--muted); line-height: 1.6; }
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 16px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(112, 184, 255, 0.14);
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .headline { font-size: 1.2rem; color: var(--text); }
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 18px;
+      }
+      a.button, a.link {
+        text-decoration: none;
+        color: var(--text);
+      }
+      a.button {
+        padding: 12px 18px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #08101f;
+        font-weight: 800;
+      }
+      a.button.secondary {
+        background: var(--panel-2);
+        color: var(--text);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .card {
+        background: rgba(22, 35, 66, 0.8);
+        border-radius: 18px;
+        padding: 18px;
+      }
+      code {
+        background: rgba(10, 18, 33, 0.9);
+        border-radius: 8px;
+        padding: 2px 6px;
+      }
+      footer { color: var(--muted); margin-top: 24px; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="eyebrow">Remote MCP memory you own</div>
+        <h1>MemHeaven</h1>
+        <p class="headline">Bring MemPalace-style long-term memory to ChatGPT and remote AI agents.</p>
+        <p>MemHeaven is a self-hosted remote MCP memory server that gives hosted AI clients searchable long-term memory you own.</p>
+        <p><strong>Deploy on a Cloudflare account.</strong> No VM, no Docker, no database admin. Free-tier limits apply, and heavier usage may require paid Cloudflare usage.</p>
+        <div class="cta-row">
+          <a class="button" href="../README.md">Quickstart</a>
+          <a class="button secondary" href="../docs/GETTING_STARTED_FROM_ZERO.md">Getting started from zero</a>
+          <a class="button secondary" href="../docs/CLIENT_COMPATIBILITY.md">Client compatibility</a>
+          <a class="button secondary" href="../docs/SECURITY.md">Security model</a>
+        </div>
+      </section>
+
+      <section>
+        <h2>Why external memory?</h2>
+        <div class="grid">
+          <div class="card"><strong>AI chats forget.</strong><p>Project context, preferences, and prior decisions often disappear between chats and sessions.</p></div>
+          <div class="card"><strong>Hosted clients need remote MCP.</strong><p>Local-first memory tools are useful, but hosted tools like ChatGPT and other remote agents need a network-accessible memory layer.</p></div>
+          <div class="card"><strong>You should own the memory.</strong><p>MemHeaven is built for searchable, inspectable, deletable, portable memory that is not hidden behind a third-party SaaS memory product.</p></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Works with hosted MCP clients</h2>
+        <p>ChatGPT is the confirmed hosted-client path today. Other remote clients are documented honestly in the compatibility matrix as confirmed, expected, experimental, or unknown.</p>
+        <p><a class="link" href="../docs/CLIENT_COMPATIBILITY.md">See the client compatibility matrix →</a></p>
+      </section>
+
+      <section>
+        <h2>How it works</h2>
+        <ul>
+          <li>Cloudflare Worker exposes OAuth endpoints and the remote <code>/mcp</code> endpoint.</li>
+          <li>D1 stores metadata and indexes.</li>
+          <li>R2 stores full drawer and diary bodies.</li>
+          <li>Workers AI generates embeddings and Vectorize powers semantic search.</li>
+          <li>Access keys gate consent and tenant-scoped tokens control what each user can see.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Inspired by MemPalace</h2>
+        <p>MemHeaven is inspired by MemPalace, the open-source local-first AI memory project that helped show how useful verbatim, searchable long-term memory can be for AI agents.</p>
+        <p>MemHeaven explores a different deployment shape: remote MCP memory for hosted clients and trusted shared setups.</p>
+      </section>
+
+      <section>
+        <h2>Get started</h2>
+        <p>Use <code>npm run init -- --base-url https://your-domain.example</code>, then generate secrets, create your first access key, deploy, and connect a client to <code>/mcp</code>.</p>
+        <p><a class="link" href="https://github.com/nazar256/memheaven">View the GitHub repository →</a></p>
+      </section>
+
+      <footer>
+        Static landing-page scaffold for MemHeaven. The repository remains the source of truth.
+      </footer>
+    </main>
+  </body>
+</html>

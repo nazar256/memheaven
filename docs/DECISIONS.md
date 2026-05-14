@@ -81,3 +81,11 @@
 - Date: 2026-05-14
 - Decision: The repo ships `npm run secrets:generate`, which prints valid 32-byte base64url values for `JWT_SIGNING_SECRET`, `TOKEN_ENCRYPTION_KEY`, and `AUTH_KEY_PEPPER`.
 - Why: Manual secret generation was error-prone and led directly to invalid `AUTH_KEY_PEPPER` values that failed runtime validation. A scripted generator removes guesswork while keeping secret persistence/operator control explicit.
+
+## D-012: MCP tools should advertise output schemas for stable success payloads
+
+- Status: Accepted
+- Date: 2026-05-14
+- Decision: Memheaven MCP tools define `outputSchema` for stable success responses and return matching `structuredContent` on successful tool calls.
+- Why: ChatGPT and other MCP clients surface a recommendation when tools omit output schemas, and providing them materially improves tool discoverability and result understanding from `tools/list` metadata.
+- Tradeoff: Error paths still use `isError: true` rather than forcing failures into a success schema; this matches the MCP SDK guidance and avoids misleading schemas for unsupported/error states.

@@ -3,6 +3,32 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+  "description": "Bring MemPalace-style long-term memory to ChatGPT and remote AI agents.",
+  "homepage": "https://github.com/nazar256/memheaven",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nazar256/memheaven.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nazar256/memheaven/issues"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "chatgpt",
+    "claude",
+    "ai-agents",
+    "agent-memory",
+    "long-term-memory",
+    "self-hosted",
+    "cloudflare-workers",
+    "semantic-search",
+    "streamable-http",
+    "oauth2",
+    "pkce",
+    "typescript"
+  ],
   "type": "module",
   "engines": {
     "node": ">=20"

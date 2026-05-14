@@ -26,8 +26,65 @@ describe('mcp auth envelope', async () => {
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} }),
     }), env);
     expect(tools.status).toBe(200);
-    const listed = await tools.json() as { result: { tools: Array<{ name: string }> } };
-    expect(listed.result.tools.some((tool) => tool.name === 'mempalace_status')).toBe(true);
+    const listed = await tools.json() as {
+      result: {
+        tools: Array<{
+          name: string;
+          outputSchema?: { type?: string; properties?: Record<string, unknown> };
+        }>;
+      };
+    };
+    const statusTool = listed.result.tools.find((tool) => tool.name === 'mempalace_status');
+    const addDrawerTool = listed.result.tools.find((tool) => tool.name === 'mempalace_add_drawer');
+
+    expect(statusTool).toBeTruthy();
+    expect(statusTool?.outputSchema?.type).toBe('object');
+    expect(statusTool?.outputSchema?.properties).toHaveProperty('protocol');
+    expect(statusTool?.outputSchema?.properties).toHaveProperty('backend');
+
+    expect(addDrawerTool).toBeTruthy();
+    expect(addDrawerTool?.outputSchema?.type).toBe('object');
+    expect(addDrawerTool?.outputSchema?.properties).toHaveProperty('drawer_id');
+    expect(addDrawerTool?.outputSchema?.properties).toHaveProperty('chunks');
+  });
+
+  it('returns structured content matching advertised schemas for tool calls', async () => {
+    const env = await createEnvWithKeys();
+    const token = await mintDirectAccessToken(env, 'tenant-a');
+
+    const response = await handler.fetch(new Request('https://memory.example.com/mcp', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json',
+        accept: 'application/json, text/event-stream',
+        'mcp-protocol-version': '2025-03-26',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'tools/call',
+        params: {
+          name: 'mempalace_status',
+          arguments: {},
+        },
+      }),
+    }), env);
+
+    expect(response.status).toBe(200);
+    const body = await response.json() as {
+      result: {
+        isError?: boolean;
+        structuredContent?: Record<string, unknown>;
+        content?: Array<{ text?: string }>;
+      };
+    };
+
+    expect(body.result.isError).not.toBe(true);
+    expect(body.result.structuredContent).toBeTruthy();
+    expect(body.result.structuredContent).toHaveProperty('protocol');
+    expect(body.result.structuredContent).toHaveProperty('backend');
+    expect(body.result.content?.[0]?.text).toContain('protocol');
   });
 
   it('rejects an access token after the backing key is removed', async () => {

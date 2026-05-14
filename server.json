@@ -1,0 +1,52 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.nazar256/memheaven",
+  "title": "MemHeaven",
+  "description": "Self-hosted remote MCP memory server for ChatGPT and AI agents.",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/nazar256/memheaven",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/nazar256/memheaven",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://{worker_domain}/mcp",
+      "variables": {
+        "worker_domain": {
+          "description": "Public MemHeaven hostname, for example memheaven.<your-workers-subdomain>.workers.dev or memory.example.com",
+          "placeholder": "memheaven.<your-workers-subdomain>.workers.dev",
+          "isRequired": true
+        }
+      }
+    }
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "auth": {
+        "type": "oauth-2.1-pkce-dcr",
+        "notes": "Hosted OAuth flow with PKCE and dynamic client registration where supported, plus an access-key gate on the consent page."
+      },
+      "setupNotes": [
+        "Deploy on Cloudflare Workers, then point the client at https://<your-worker-domain>/mcp.",
+        "Generate an access key with npm run keygen and authorize with the printed raw key.",
+        "See docs/GETTING_STARTED_FROM_ZERO.md for a full guided setup."
+      ],
+      "requiredSecrets": [
+        "JWT_SIGNING_SECRET",
+        "TOKEN_ENCRYPTION_KEY",
+        "AUTH_KEY_PEPPER",
+        "ACCESS_KEYS_JSON"
+      ],
+      "environmentVariables": [
+        "OAUTH_ISSUER",
+        "MCP_RESOURCE",
+        "MCP_AUDIENCE",
+        "EMBEDDING_MODEL",
+        "EMBEDDING_DIMENSIONS",
+        "VECTORIZE_INDEX_NAME"
+      ]
+    }
+  }
+}
