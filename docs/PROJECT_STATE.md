@@ -19,6 +19,7 @@ Publish-ready MVP for `memheaven`, a Cloudflare-native MemPalace-compatible remo
 - Added MIT license and scrubbed public-facing docs/config examples so repository publishing does not expose private operator details.
 - Added MCP `outputSchema` coverage across the exposed tool surface so ChatGPT can understand structured tool results better.
 - Added public-launch packaging docs and metadata: rewritten README first screen, zero-to-deploy guide, client compatibility matrix, security docs, agent memory protocol doc, launch checklist, `server.json`, `glama.json`, and a lightweight landing-page scaffold.
+- Sanitized public launch artifacts further by restoring placeholder `wrangler.toml` values, downgrading ChatGPT docs from Confirmed to Expected pending final launch verification, and removing live deployment identifiers from public-facing docs.
 - Validated `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npx wrangler deploy --dry-run --outdir .tmp/wrangler-bundle`.
 
 ## Validation snapshot

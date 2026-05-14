@@ -4,15 +4,15 @@ This file tracks what should be in place before MemHeaven is promoted broadly.
 
 ## Repo readiness checklist
 
-- [ ] README first screen is clear, value-led, and has quick links
-- [ ] `docs/GETTING_STARTED_FROM_ZERO.md` exists and is beginner-friendly
-- [ ] `docs/CLIENT_COMPATIBILITY.md` is honest about confirmed vs expected vs unknown clients
-- [ ] `docs/AGENT_MEMORY_PROTOCOL.md` exists with copy-paste instructions
-- [ ] `SECURITY.md` and `docs/SECURITY.md` exist
-- [ ] `server.json` exists for MCP registry-style discovery
-- [ ] `glama.json` exists for Glama listing ownership
-- [ ] `site/index.html` exists as a lightweight landing-page scaffold
-- [ ] package metadata (`description`, `repository`, `homepage`, `keywords`) is present
+- [x] README first screen is clear, value-led, and has quick links
+- [x] `docs/GETTING_STARTED_FROM_ZERO.md` exists and is beginner-friendly
+- [x] `docs/CLIENT_COMPATIBILITY.md` is honest about confirmed vs expected vs unknown clients
+- [x] `docs/AGENT_MEMORY_PROTOCOL.md` exists with copy-paste instructions
+- [x] `SECURITY.md` and `docs/SECURITY.md` exist
+- [x] `server.json` exists for MCP registry-style discovery
+- [x] `glama.json` exists for Glama listing ownership
+- [x] `site/index.html` exists as a lightweight landing-page scaffold
+- [x] package metadata (`description`, `repository`, `homepage`, `keywords`) is present
 
 ## Metadata checklist
 
@@ -32,7 +32,7 @@ This file tracks what should be in place before MemHeaven is promoted broadly.
 
 ## Registry and catalog checklist
 
-- [ ] Official MCP Registry submission prep (`server.json`)
+- [x] Official MCP Registry submission prep (`server.json`)
 - [ ] Glama listing / claim (`glama.json`)
 - [ ] [`punkpeye/awesome-mcp-servers`](https://github.com/punkpeye/awesome-mcp-servers)
 - [ ] [`awesome-remote-mcp-servers`](https://github.com/appcypher/awesome-remote-mcp-servers) or equivalent curated remote list
@@ -118,6 +118,7 @@ Manual settings to check:
 ## Client and docs TODOs still worth verifying
 
 - [ ] Verify a stable official OpenAI documentation URL for ChatGPT custom MCP / connector setup
+- [ ] Validate `server.json` with the official MCP registry publisher before submission
 - [ ] Run a real Claude hosted remote connector test after callback allowlist support is expanded
 - [ ] Verify Cursor callback behavior against current public docs before marking it above Experimental
 - [ ] Verify VS Code / Copilot hosted OAuth flow against a live deployment before marking it above Experimental

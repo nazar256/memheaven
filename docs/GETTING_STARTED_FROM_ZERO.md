@@ -184,12 +184,14 @@ Your MCP URL is:
 https://memheaven.<your-workers-subdomain>.workers.dev/mcp
 ```
 
-### ChatGPT (confirmed path)
+### ChatGPT (primary target / expected path)
 
 1. Add the MCP connector in ChatGPT using the `/mcp` URL above.
 2. Let ChatGPT perform OAuth discovery and registration.
 3. When the MemHeaven authorization page opens, paste the `raw_key` from step 10.
 4. Finish the authorization flow.
+
+Treat ChatGPT as the primary hosted-client target for MemHeaven, but re-verify the full flow against your final deployed `/mcp` URL before making strong public compatibility claims.
 
 ### Claude-family hosted connectors (expected / experimental)
 

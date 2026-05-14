@@ -4,7 +4,7 @@
 
 MemHeaven is a self-hosted remote MCP memory server that gives hosted AI clients searchable long-term memory you own.
 
-**Deploy on a Cloudflare account. No VM, no Docker, no database admin.**
+**Deploy on a Cloudflare Free account. No VM, no Docker, no database admin.**
 
 Free-tier limits apply; heavy usage may require paid Cloudflare usage.
 
@@ -80,7 +80,7 @@ If you want the hand-holding version, use [`docs/GETTING_STARTED_FROM_ZERO.md`](
 
 | Client | Status | Notes |
 | --- | --- | --- |
-| ChatGPT | **Confirmed** | Main validated hosted-client path today |
+| ChatGPT | **Expected (primary target)** | Main hosted-client target; re-verify end-to-end against the final `/mcp` URL before broad launch claims |
 | Claude.ai remote connectors | **Expected** | Protocol-compatible, but callback allowlist expansion is needed first |
 | Claude Desktop remote connectors | **Expected** | Same hosted callback story as Claude.ai |
 | Claude Code | **Expected** | Loopback callback model fits MemHeaven's localhost allowance |
@@ -397,7 +397,7 @@ npx wrangler deploy
 4. Approve the connector.
 5. ChatGPT will use bearer tokens against `/mcp`.
 
-Success looks like ChatGPT returning from the consent page without an OAuth error and then being able to list/call tools such as `mempalace_status`.
+Success looks like ChatGPT returning from the consent page without an OAuth error and then being able to list/call tools such as `mempalace_status`. Before broad public launch, re-verify this flow against your final deployed `/mcp` URL.
 
 Redirect URIs are intentionally restricted to ChatGPT callback URLs and localhost for development in the current repo defaults.
 
@@ -469,7 +469,6 @@ The service does not trust client-supplied tenant information; isolation comes f
 - `docs/IMPLEMENTATION_PLAN.md`
 - `docs/PROJECT_STATE.md`
 - `docs/DECISIONS.md`
-- `CONTINUE.md`
 
 ## License
 

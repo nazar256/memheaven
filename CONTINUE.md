@@ -1,40 +1,20 @@
 # Continue
 
-## Last completed work
+Internal handoff summary for future maintenance sessions.
 
-- Finished the Cloudflare-native MemPalace-compatible MVP implementation.
-- Added OAuth/access-key flow, stateless MCP transport, drawer/diary/KG/tunnel services, quota enforcement, helper scripts, CI, and deployment docs.
-- Hardened multi-tenant behavior by enforcing live access-key scopes on tool execution/refresh, validating unique access-key ids and hashes, and rejecting cross-tenant tunnel drawer references.
-- Renamed the project/service/deployment identity to `memheaven` across package metadata, worker metadata, docs, and Cloudflare resources while intentionally preserving the `mempalace_*` tool names.
-- Deployed to a private workers.dev endpoint, applied remote D1 migrations, and verified OAuth + MCP end-to-end with two isolated tenants using fresh memheaven-specific keys.
-- Added first-time setup polish: `npm run init -- --base-url ...`, `npm run secrets:generate`, smoother key/tenant docs, MIT license, and public-facing privacy scrubbing.
-- Added MCP output schemas across the tool surface and MCP-layer tests that `tools/list` advertises them.
-- Repatched `wrangler.toml` to the real `https://memheaven.xyofn8h7t.workers.dev` origin, redeployed, and re-verified live health/OAuth/MCP challenge endpoints.
-- Added launch-oriented docs/metadata packaging: README rewrite, `docs/GETTING_STARTED_FROM_ZERO.md`, `docs/CLIENT_COMPATIBILITY.md`, `docs/AGENT_MEMORY_PROTOCOL.md`, `SECURITY.md`, `docs/SECURITY.md`, `docs/LAUNCH.md`, `server.json`, `glama.json`, and `site/index.html`.
-- Validated lint, typecheck, tests, build, and Wrangler dry-run successfully.
+Public launch docs should treat `docs/PROJECT_STATE.md`, `README.md`, and `docs/LAUNCH.md` as the primary public-facing sources of truth.
 
-## Immediate next actions
+## Current maintenance notes
 
-1. Optionally rotate/remove the temporary smoke-test access keys used for renamed deployment validation.
-2. Optionally bind a custom domain instead of the workers.dev hostname.
-3. Add a real logo/social preview asset before broad public submission.
-4. Verify Claude hosted connector flow before upgrading it beyond Expected in docs.
-5. Verify ChatGPT Developer Mode manually against the final `/mcp` URL.
-
-## Notes for next agent
-
+- `wrangler.toml` should stay publish-safe in git. Use `npm run init -- --base-url <public-origin>` to patch the real D1 id and OAuth/MCP URLs locally before deploy.
 - `/mcp` requests must include `Accept: application/json, text/event-stream` or the MCP SDK returns `406 Not Acceptable`.
-- `npm run build` writes artifacts to `.tmp/dist`; `.tmp/**` is ignored by ESLint and git.
-- `npx wrangler deploy --dry-run --outdir .tmp/wrangler-bundle` succeeds in this repo.
 - Local browser OAuth on plain `http://127.0.0.1` / `localhost` requires a non-Secure CSRF cookie; this is already implemented and regression-tested.
-- When checking Cloudflare auth, use plain-environment `wrangler whoami` first; custom HOME/XDG wrappers can hide an existing Wrangler login and produce false “not authenticated” results.
-- In this session, `rtk npx wrangler secret put ...` reported success but the deployed Worker still read secrets as missing; rerunning with plain `npx wrangler secret put ...` fixed it.
-- For public publishing, `wrangler.toml` uses placeholder D1/OAuth values. Run `npm run init -- --base-url <public-origin>` in the target account to patch the real D1 id and OAuth/MCP URLs.
-- Pre-rename temp artifacts were moved to `.tmp/trash/20260514_rename_memheaven/`.
 - Local-only MemPalace tools are intentionally adapted; `mempalace_sync` remains an explicit unsupported response.
 - If Vectorize metadata indexes are added after ingestion, use `npm run reindex -- --base https://<domain> --token <token> [--dry-run]`.
 - MCP tools now advertise `outputSchema`; future tool additions should keep output schemas and MCP-layer assertions in sync.
-- Latest validation: `npm test` (46 tests), `npm run typecheck`, `npm run lint`, and `npm run build` all succeeded after output-schema coverage was added.
-- Latest live deploy: `https://memheaven.xyofn8h7t.workers.dev` on Version ID `cd410de1-4d2b-470f-8574-9b9d2ca5895e`.
-- Latest live smokes after redeploy: `/health` returned `ok: true`, OAuth metadata endpoints returned 200, and unauthenticated `/mcp` returned the expected 401 challenge.
-- Launch docs intentionally avoid overclaiming client support: ChatGPT is Confirmed, Claude hosted connectors are Expected pending callback allowlist expansion and a real end-to-end test, and several other clients remain Experimental/Unknown.
+
+## Open follow-ups
+
+1. Add a real logo/social preview asset before broad public submission.
+2. Verify Claude hosted connector flow before upgrading it beyond Expected in docs.
+3. Re-verify ChatGPT Developer Mode against the final public `/mcp` URL before broad launch claims.
