@@ -12,13 +12,14 @@ This file tracks what should be in place before MemHeaven is promoted broadly.
 - [x] `server.json` exists for MCP registry-style discovery
 - [x] `glama.json` exists for Glama listing ownership
 - [x] `site/index.html` exists as a lightweight landing-page scaffold
+- [x] GitHub Pages publishes the landing page at https://nazar256.github.io/memheaven/
 - [x] package metadata (`description`, `repository`, `homepage`, `keywords`) is present
 
 ## Metadata checklist
 
 - [ ] GitHub repo description set
 - [ ] GitHub topics set
-- [ ] website URL set
+- [x] website URL set (https://nazar256.github.io/memheaven/)
 - [ ] social preview image uploaded
 - [ ] release notes / first release draft prepared
 
