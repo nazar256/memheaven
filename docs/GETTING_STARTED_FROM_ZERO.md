@@ -109,6 +109,8 @@ This command will:
 - patch the OAuth/MCP URLs in `wrangler.toml`
 - apply remote D1 migrations by default
 
+After `npm run init -- --base-url ...`, your local `wrangler.toml` may contain account-specific deployment values. Do not commit those values back to a public fork.
+
 If you just want to see what it would do:
 
 ```bash
@@ -184,14 +186,14 @@ Your MCP URL is:
 https://memheaven.<your-workers-subdomain>.workers.dev/mcp
 ```
 
-### ChatGPT (primary target / expected path)
+### ChatGPT (confirmed path)
 
 1. Add the MCP connector in ChatGPT using the `/mcp` URL above.
 2. Let ChatGPT perform OAuth discovery and registration.
 3. When the MemHeaven authorization page opens, paste the `raw_key` from step 10.
 4. Finish the authorization flow.
 
-Treat ChatGPT as the primary hosted-client target for MemHeaven, but re-verify the full flow against your final deployed `/mcp` URL before making strong public compatibility claims.
+MemHeaven's ChatGPT path has been manually verified narrowly for the `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call. That confirms the main connector flow without implying support across every ChatGPT plan or workspace configuration.
 
 ### Claude-family hosted connectors (expected / experimental)
 

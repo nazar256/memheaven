@@ -82,7 +82,7 @@ If you want the hand-holding version, use [`docs/GETTING_STARTED_FROM_ZERO.md`](
 
 | Client | Status | Notes |
 | --- | --- | --- |
-| ChatGPT | **Expected (primary target)** | Main hosted-client target; re-verify end-to-end against the final `/mcp` URL before broad launch claims |
+| ChatGPT | **Confirmed** | Manually verified end-to-end for the `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call |
 | Claude.ai remote connectors | **Expected** | Protocol-compatible, but callback allowlist expansion is needed first |
 | Claude Desktop remote connectors | **Expected** | Same hosted callback story as Claude.ai |
 | Claude Code | **Expected** | Loopback callback model fits MemHeaven's localhost allowance |
@@ -261,6 +261,8 @@ npm run init -- --base-url https://memheaven.<your-workers-subdomain>.workers.de
 - patches `OAUTH_ISSUER`, `MCP_RESOURCE`, and `MCP_AUDIENCE` when `--base-url` is provided
 - applies remote D1 migrations by default
 
+After `npm run init -- --base-url ...`, your local `wrangler.toml` may contain account-specific deployment values. Do not commit those values back to a public fork.
+
 Useful variants:
 
 ```bash
@@ -399,7 +401,7 @@ npx wrangler deploy
 4. Approve the connector.
 5. ChatGPT will use bearer tokens against `/mcp`.
 
-Success looks like ChatGPT returning from the consent page without an OAuth error and then being able to list/call tools such as `mempalace_status`. Before broad public launch, re-verify this flow against your final deployed `/mcp` URL.
+ChatGPT has been manually verified end-to-end for MemHeaven's `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call. That confirms the main hosted-client path without claiming that every ChatGPT plan or workspace supports custom MCP connectors.
 
 Redirect URIs are intentionally restricted to ChatGPT callback URLs and localhost for development in the current repo defaults.
 

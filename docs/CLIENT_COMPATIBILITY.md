@@ -22,7 +22,7 @@ That means the matrix below distinguishes between:
 
 | Client | Transport | Auth | OAuth callback / redirect notes | Status | Setup docs | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| ChatGPT Apps / custom MCP apps | Streamable HTTP | OAuth 2.1-style + PKCE + DCR | Hosted callbacks on `chatgpt.com`, including `https://chatgpt.com/connector/oauth/<id>` and `https://chatgpt.com/connector_platform_oauth_redirect` | **Expected** | [README](../README.md#chatgpt-setup) | This is the primary hosted-client target, but it should be re-verified end-to-end against the final public `/mcp` URL before broad launch claims. |
+| ChatGPT Apps / custom MCP apps | Streamable HTTP | OAuth 2.1-style + PKCE + DCR | Hosted callbacks on `chatgpt.com`, including `https://chatgpt.com/connector/oauth/<id>` and `https://chatgpt.com/connector_platform_oauth_redirect` | **Confirmed** | [README](../README.md#chatgpt-setup) | Manually verified narrowly for the `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call. This does not imply support across every ChatGPT plan or workspace configuration. |
 | Claude.ai remote connectors | Remote MCP over HTTP | OAuth + PKCE + DCR or CIMD | `https://claude.ai/api/mcp/auth_callback` | **Expected** | [Anthropic custom connectors guide](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp) | Protocol-compatible, but current MemHeaven defaults do not pre-allowlist Claude's hosted callback. Expand redirect support carefully first. |
 | Claude Desktop remote connectors | Remote MCP over HTTP | OAuth + PKCE + DCR or CIMD | Same hosted callback path as Claude account-level connectors | **Expected** | [Anthropic custom connectors guide](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp) | Remote connectors are brokered through Anthropic's cloud; treat like Claude.ai for callback policy. |
 | Claude Code | Streamable HTTP | OAuth + PKCE + DCR/CIMD or explicit client config | Loopback callbacks such as `http://127.0.0.1:<port>/callback` or `http://localhost:<port>/callback` | **Expected** | [Claude Code MCP docs](https://code.claude.com/docs/claude-code/mcp) | MemHeaven already allows localhost loopback callbacks. End-to-end verification is still recommended. |
@@ -62,7 +62,7 @@ Warnings:
 
 For public launch, lead with:
 
-1. **ChatGPT** as the primary hosted-client target, pending final end-to-end launch verification
+1. **ChatGPT** as the confirmed hosted-client starting point
 2. **Claude Code / localhost-loopback clients** as the first additional target to verify
 3. **Claude.ai / Claude Desktop remote connectors** after adding the exact callback allowlist entries above
 

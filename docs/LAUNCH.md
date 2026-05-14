@@ -26,9 +26,9 @@ This file tracks what should be in place before MemHeaven is promoted broadly.
 
 - [x] Add `assets/memheaven-logo.svg` or `assets/memheaven-logo.png`
 - [ ] Add a social preview image for GitHub
-- [ ] Add icon assets if you want `server.json` to advertise icons
+- [x] Add icon assets if you want `server.json` to advertise icons
 
-> TODO: a logo asset now exists in the repo, but a dedicated GitHub social preview image is still missing.
+> TODO: `assets/memheaven-icon.png` is the small registry/client icon, while `assets/memheaven-logo.png` is the larger README/landing logo. A dedicated GitHub social preview image is still missing.
 
 ## Registry and catalog checklist
 
@@ -122,6 +122,7 @@ Manual settings to check:
 - [ ] Run a real Claude hosted remote connector test after callback allowlist support is expanded
 - [ ] Verify Cursor callback behavior against current public docs before marking it above Experimental
 - [ ] Verify VS Code / Copilot hosted OAuth flow against a live deployment before marking it above Experimental
+- [ ] Add optional GitHub Actions deployment guide using Cloudflare API token, Cloudflare account ID, and `MEMHEAVEN_BASE_URL`; CI should run `npm run init -- --base-url "$MEMHEAVEN_BASE_URL"` before `wrangler deploy`
 
 ## Videos and demos
 

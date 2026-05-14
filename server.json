@@ -2,6 +2,12 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.nazar256/memheaven",
   "title": "MemHeaven",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/nazar256/memheaven/main/assets/memheaven-icon.png",
+      "mimeType": "image/png"
+    }
+  ],
   "description": "Self-hosted remote MCP memory server for ChatGPT and AI agents.",
   "version": "0.1.0",
   "repository": {
