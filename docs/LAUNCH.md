@@ -34,11 +34,12 @@ This file tracks what should be in place before MemHeaven is promoted broadly.
 ## Registry and catalog checklist
 
 - [x] Official MCP Registry submission prep (`server.json`)
-- [ ] Glama listing / claim (`glama.json`)
-- [ ] [`punkpeye/awesome-mcp-servers`](https://github.com/punkpeye/awesome-mcp-servers)
+- [x] Official MCP Registry published (`io.github.nazar256/memheaven`)
+- [ ] Glama listing / claim (`glama.json`) (blocked on discoverable submission/claim flow)
+- [x] [`punkpeye/awesome-mcp-servers`](https://github.com/punkpeye/awesome-mcp-servers) PR opened: https://github.com/punkpeye/awesome-mcp-servers/pull/6361
 - [ ] [`awesome-remote-mcp-servers`](https://github.com/appcypher/awesome-remote-mcp-servers) or equivalent curated remote list
-- [ ] [Glama](https://glama.ai/mcp)
-- [ ] mcpservers.org
+- [ ] [Glama](https://glama.ai/mcp) (blocked on discoverable submission flow)
+- [ ] mcpservers.org (blocked on required email)
 - [ ] MCP Find
 - [ ] Cloudflare Workers/community listings if useful
 
