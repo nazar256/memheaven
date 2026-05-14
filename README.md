@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/memheaven-logo.png" alt="MemHeaven logo" width="180"></p>
+
 # MemHeaven
 
 **Bring MemPalace-style long-term memory to ChatGPT and remote AI agents.**
@@ -31,7 +33,7 @@ MemHeaven is for people who want:
 - Users want inspectable, searchable, deletable, portable memory.
 - Coding agents need continuity across sessions, editors, and tools.
 
-## Cloudflare account is enough for personal use
+## Cloudflare Free account is enough for personal use
 
 MemHeaven is designed for personal use and small trusted-group usage on Cloudflare-managed services.
 

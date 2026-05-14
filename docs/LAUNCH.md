@@ -24,11 +24,11 @@ This file tracks what should be in place before MemHeaven is promoted broadly.
 
 ## Logo and social preview checklist
 
-- [ ] Add `assets/memheaven-logo.svg` or `assets/memheaven-logo.png`
+- [x] Add `assets/memheaven-logo.svg` or `assets/memheaven-logo.png`
 - [ ] Add a social preview image for GitHub
 - [ ] Add icon assets if you want `server.json` to advertise icons
 
-> TODO: no logo asset exists in the repo right now. Add one before registry/catalog polish that depends on branded visuals.
+> TODO: a logo asset now exists in the repo, but a dedicated GitHub social preview image is still missing.
 
 ## Registry and catalog checklist
 
