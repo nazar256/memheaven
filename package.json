@@ -1,0 +1,41 @@
+{
+  "name": "memheaven",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "init": "tsx scripts/bootstrap.ts",
+    "secrets:generate": "tsx scripts/generate-secrets.ts",
+    "keygen": "tsx scripts/generate-access-key.ts",
+    "smoke:oauth": "tsx scripts/smoke-oauth.ts",
+    "smoke:mcp": "tsx scripts/smoke-mcp.ts",
+    "reindex": "tsx scripts/reindex.ts"
+  },
+  "dependencies": {
+    "@cfworker/json-schema": "^4.1.1",
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "jose": "6.1.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "latest",
+    "@types/sql.js": "^1.4.11",
+    "@eslint/js": "^9.27.0",
+    "eslint": "^9.27.0",
+    "globals": "^15.15.0",
+    "sql.js": "^1.13.0",
+    "tsx": "^4.19.4",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.32.0",
+    "vitest": "3.2.4",
+    "wrangler": "4.39.0"
+  }
+}
