@@ -90,6 +90,7 @@ Important:
 - use the **origin only** here
 - do **not** include `/mcp`
 - your OAuth issuer, resource, audience, and connector URL must all line up with this same base URL
+- changing this public origin later changes the derived OAuth client identity and will force hosted clients like ChatGPT to reconnect
 
 ## 7. Create the Cloudflare resources and patch config
 

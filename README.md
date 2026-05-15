@@ -209,6 +209,8 @@ This is the happy path for a new self-hosted deployment.
    - Workers.dev example: `https://memheaven.<your-workers-subdomain>.workers.dev`
    - Custom domain example: `https://memory.example.com`
 
+   Pick the final public origin you actually plan to keep using. Changing the public origin later changes the OAuth issuer/client identity and will force hosted clients like ChatGPT to reconnect.
+
 3. Create Cloudflare resources, patch `wrangler.toml`, and apply remote migrations:
 
    ```bash
