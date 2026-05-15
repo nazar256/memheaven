@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "description": "Bring MemPalace-style long-term memory to ChatGPT and remote AI agents.",
-  "homepage": "https://github.com/nazar256/memheaven",
+  "homepage": "https://nazar256.github.io/memheaven/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nazar256/memheaven.git"
