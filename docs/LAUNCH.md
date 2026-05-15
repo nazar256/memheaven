@@ -1,132 +1,37 @@
 # Launch checklist
 
-This file tracks what should be in place before MemHeaven is promoted broadly.
+Concise status tracker for MemHeaven launch readiness.
 
-## Repo readiness checklist
+## Done
 
-- [x] README first screen is clear, value-led, and has quick links
-- [x] `docs/GETTING_STARTED_FROM_ZERO.md` exists and is beginner-friendly
-- [x] `docs/CLIENT_COMPATIBILITY.md` is honest about confirmed vs expected vs unknown clients
-- [x] `docs/AGENT_MEMORY_PROTOCOL.md` exists with copy-paste instructions
-- [x] `SECURITY.md` and `docs/SECURITY.md` exist
-- [x] `server.json` exists for MCP registry-style discovery
-- [x] `glama.json` exists for Glama listing ownership
-- [x] `site/index.html` exists as a lightweight landing-page scaffold
-- [x] GitHub Pages publishes the landing page at https://nazar256.github.io/memheaven/
-- [x] package metadata (`description`, `repository`, `homepage`, `keywords`) is present
+- [x] GitHub repo description set
+- [x] GitHub topics set
+- [x] website URL set: https://nazar256.github.io/memheaven/
+- [x] social preview image asset added; GitHub UI upload reported done
+- [x] GitHub Pages landing page published
+- [x] Official MCP Registry published / submitted
+- [x] Glama listing live enough for badge
+- [x] mcpservers.org submitted
+- [x] mcp.so submitted through real site flow
+- [x] `punkpeye/awesome-mcp-servers` PR opened
 
-## Metadata checklist
+## Pending
 
-- [ ] GitHub repo description set
-- [ ] GitHub topics set
-- [x] website URL set (https://nazar256.github.io/memheaven/)
-- [ ] social preview image uploaded
-- [ ] release notes / first release draft prepared
+- [ ] release notes / first release draft
+- [ ] GitHub Actions deployment guide
+- [ ] Claude hosted connector verification
+- [ ] Cursor verification
+- [ ] VS Code / Copilot verification
+- [ ] more community posts
+- [ ] MCP Find submission (if/when actually done)
 
-## Logo and social preview checklist
+## Assets and entry points
 
-- [x] Add `assets/memheaven-logo.svg` or `assets/memheaven-logo.png`
-- [ ] Add a social preview image for GitHub
-- [x] Add icon assets if you want `server.json` to advertise icons
+- Landing page: https://nazar256.github.io/memheaven/
+- Production MCP base: https://memheaven.xyofn8h7t.workers.dev
+- Glama listing: https://glama.ai/mcp/servers/nazar256/memheaven
 
-> TODO: `assets/memheaven-icon.png` is the small registry/client icon, while `assets/memheaven-logo.png` is the larger README/landing logo. A dedicated GitHub social preview image is still missing.
+## Notes
 
-## Registry and catalog checklist
-
-- [x] Official MCP Registry submission prep (`server.json`)
-- [ ] Glama listing / claim (`glama.json`)
-- [ ] [`punkpeye/awesome-mcp-servers`](https://github.com/punkpeye/awesome-mcp-servers)
-- [ ] [`awesome-remote-mcp-servers`](https://github.com/appcypher/awesome-remote-mcp-servers) or equivalent curated remote list
-- [ ] [Glama](https://glama.ai/mcp)
-- [ ] mcpservers.org
-- [ ] MCP Find
-- [ ] Cloudflare Workers/community listings if useful
-
-## Low-effort promotion plan
-
-1. Update GitHub description, topics, and social preview
-2. Publish `server.json` / `glama.json`
-3. Submit to official registry/catalogs
-4. Submit to awesome lists
-5. Post in Cursor / Roo / Cline communities **only after** the client-compatibility docs are solid
-6. Consider Show HN **only after** there is either a simple demo or truly dead-simple setup
-
-## Agent-friendly submission pack
-
-Use these blurbs when submitting to registries and lists.
-
-### Short description
-
-```text
-Self-hosted remote MCP memory server for ChatGPT and AI agents.
-```
-
-### Punchy description
-
-```text
-Bring MemPalace-style long-term memory to ChatGPT and remote AI agents.
-```
-
-### Registry blurb
-
-```text
-MemHeaven is an open-source, self-hosted remote MCP memory server that gives ChatGPT and AI agents durable long-term memory over Streamable HTTP. It is MemPalace-inspired, deploys on Cloudflare Workers, and is designed for users who want hosted AI clients without surrendering memory to a third-party SaaS.
-```
-
-### Awesome-list snippet
-
-```md
-- [MemHeaven](https://github.com/nazar256/memheaven) - Self-hosted remote MCP memory server with Streamable HTTP, OAuth, and shared long-term memory for ChatGPT and AI agents.
-```
-
-## GitHub settings TODOs
-
-Recommended GitHub description:
-
-```text
-Bring MemPalace-style long-term memory to ChatGPT and remote AI agents.
-```
-
-Recommended topics:
-
-```text
-mcp
-mcp-server
-model-context-protocol
-chatgpt
-claude
-ai-agents
-agent-memory
-long-term-memory
-self-hosted
-cloudflare-workers
-semantic-search
-streamable-http
-oauth2
-pkce
-typescript
-```
-
-Manual settings to check:
-
-- [ ] repository description
-- [ ] repository topics
-- [ ] social preview image
-- [ ] website URL
-- [ ] Discussions enabled if desired
-- [ ] issue templates if you want contributor-friendly triage
-
-## Client and docs TODOs still worth verifying
-
-- [ ] Verify a stable official OpenAI documentation URL for ChatGPT custom MCP / connector setup
-- [ ] Validate `server.json` with the official MCP registry publisher before submission
-- [ ] Run a real Claude hosted remote connector test after callback allowlist support is expanded
-- [ ] Verify Cursor callback behavior against current public docs before marking it above Experimental
-- [ ] Verify VS Code / Copilot hosted OAuth flow against a live deployment before marking it above Experimental
-- [ ] Add optional GitHub Actions deployment guide using Cloudflare API token, Cloudflare account ID, and `MEMHEAVEN_BASE_URL`; CI should run `npm run init -- --base-url "$MEMHEAVEN_BASE_URL"` before `wrangler deploy`
-
-## Videos and demos
-
-No YouTube video is required from the maintainer for launch.
-
-Videos are nice community upside, not a launch prerequisite.
+- Keep `wrangler.toml` publish-safe in git.
+- Do not recreate detailed submission logs in this repo.
