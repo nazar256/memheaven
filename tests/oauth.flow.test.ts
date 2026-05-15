@@ -31,7 +31,9 @@ describe('oauth flow', async () => {
       'https://chatgpt.com/connector/oauth/test-client',
       'https://claude.ai/api/mcp/auth_callback',
       'https://vscode.dev/redirect',
-      'http://127.0.0.1:33418',
+      'http://localhost:8787/callback',
+      'http://127.0.0.1:33418/callback',
+      'http://[::1]:4312/callback',
     ];
 
     for (const allowedRedirect of allowedRedirects) {
@@ -45,10 +47,19 @@ describe('oauth flow', async () => {
 
     const rejectedRedirects = [
       'https://evil.example.com/callback',
-      'https://claude.ai/evil',
+      'https://chatgpt.com.evil.com/connector_platform_oauth_redirect',
+      'https://claude.ai.evil.com/api/mcp/auth_callback',
       'https://vscode.dev/evil',
+      'https://claude.ai/api/mcp/auth_callback/extra',
+      'https://chatgpt.com/connector_platform_oauth_redirect/extra',
       'https://chatgpt.com/connector/oauth/test-client/evil',
+      'https://grok.com/oauth/callback',
+      'https://api.x.ai/oauth/callback',
       'https://x.ai/oauth/callback',
+      'https://perplexity.ai/oauth/callback',
+      'https://abacus.ai/oauth/callback',
+      'https://chatgpt.com@evil.com/callback',
+      'https://evil.com/callback#https://chatgpt.com/connector_platform_oauth_redirect',
     ];
 
     for (const rejectedRedirect of rejectedRedirects) {

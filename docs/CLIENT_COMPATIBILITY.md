@@ -1,6 +1,6 @@
 # Client compatibility
 
-MemHeaven speaks remote MCP over **Streamable HTTP** and uses OAuth with PKCE. That makes it broadly compatible in principle, but **client-specific callback rules and auth expectations still matter**.
+MemHeaven speaks remote MCP over **Streamable HTTP**. Hosted OAuth clients still depend on precise redirect contracts, and non-OAuth hosts need a way to send `Authorization: Bearer <token>` to `/mcp`.
 
 ## Important current default
 
@@ -8,8 +8,8 @@ The current repository keeps redirect support narrow and contract-driven:
 
 - ChatGPT hosted callback URLs are allowed
 - Claude's documented hosted callback `https://claude.ai/api/mcp/auth_callback` is allowed
-- VS Code's documented callbacks `https://vscode.dev/redirect` and `http://127.0.0.1:33418` are allowed
-- localhost / `127.0.0.1` loopback callbacks remain allowed for local development and CLI-style OAuth flows
+- VS Code's documented callback `https://vscode.dev/redirect` remains allowed
+- generic localhost / `127.0.0.1` / `[::1]` loopback callbacks remain allowed for local IDE, CLI, and browser-based OAuth flows
 - other hosted callback patterns are **not enabled by default**
 
 Callback allowlist decisions are contract-driven, not brand-driven.
@@ -18,28 +18,19 @@ That means the matrix below distinguishes between:
 
 - **Confirmed**: directly tested end-to-end in this repository
 - **Expected**: protocol-compatible and likely to work, but not fully verified end-to-end here
-- **Experimental**: some evidence exists, but callback/OAuth details still need a real test
 - **Unknown**: not enough reliable public information yet
-- **Unsupported**: not a target right now
 
 ## Matrix
 
 | Client | Transport | Auth | OAuth callback / redirect notes | Status | Setup docs | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | ChatGPT Apps / custom MCP apps | Streamable HTTP | OAuth 2.1-style + PKCE + DCR | Hosted callbacks on `chatgpt.com`, including `https://chatgpt.com/connector/oauth/<id>` and `https://chatgpt.com/connector_platform_oauth_redirect` | **Confirmed** | [README](../README.md#chatgpt-setup) | Manually verified narrowly for the `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call. This does not imply support across every ChatGPT plan or workspace configuration. |
-| Claude.ai remote connectors | Remote MCP over HTTP | OAuth + PKCE + DCR or CIMD | `https://claude.ai/api/mcp/auth_callback` | **Expected** | [Anthropic custom connectors guide](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp) | Callback contract is documented and allowlisted; end-to-end verification is still recommended. |
-| Claude Desktop remote connectors | Remote MCP over HTTP | OAuth + PKCE + DCR or CIMD | Same hosted callback path as Claude account-level connectors | **Expected** | [Anthropic custom connectors guide](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp) | Remote connectors are brokered through Anthropic's cloud; treat like Claude.ai for callback policy. |
-| Claude Code | Streamable HTTP | OAuth + PKCE + DCR/CIMD or explicit client config | Loopback callbacks such as `http://127.0.0.1:<port>/callback` or `http://localhost:<port>/callback` | **Expected** | [Claude Code MCP docs](https://code.claude.com/docs/claude-code/mcp) | MemHeaven already allows localhost loopback callbacks. End-to-end verification is still recommended. |
-| Cursor | Streamable HTTP | OAuth | No officially documented hosted OAuth callback contract confirmed here | **Experimental** | Verify current Cursor MCP docs before rollout | Do not add callback support until Cursor publishes a stable callback contract you can pin exactly. |
-| VS Code / GitHub Copilot MCP | HTTP MCP / Streamable HTTP-style remote server support | OAuth / DCR | `https://vscode.dev/redirect` and `http://127.0.0.1:33418` | **Experimental** | [VS Code MCP docs](https://code.visualstudio.com/docs/copilot/customization/mcp-servers) | Callback contracts are documented and allowlisted; end-to-end verification is still needed before claiming broad support. |
-| Windsurf | Likely remote HTTP | Likely OAuth | Public callback contract not verified | **Unknown** | Verify current Windsurf MCP docs | Do not pre-allowlist until callback behavior is documented. |
-| Cline | Likely remote HTTP | Likely OAuth or token-based | Public callback contract not verified | **Unknown** | Verify current Cline docs | MCP support exists in the ecosystem, but hosted OAuth details are not confidently documented here. |
-| Roo Code | Unknown / evolving | Unknown | Public callback contract not verified | **Unknown** | Verify current Roo Code docs | Treat as unknown until a concrete remote OAuth pattern is documented. |
-| Gemini CLI | MCP support not verified for hosted OAuth use here | Unknown | No documented hosted callback pattern confirmed here | **Unknown** | Verify current Gemini CLI docs | Do not market as supported yet. |
-| OpenCode | MCP-capable environment, but hosted OAuth contract not verified here | Unknown | No public hosted callback contract confirmed here | **Unknown** | Verify current OpenCode docs | Good candidate for experimentation, but not a confirmed hosted-client target yet. |
-| Grok / xAI | Unknown | Unknown | No documented remote MCP callback contract confirmed here | **Unknown** | Verify current xAI docs | Do not claim support until docs and a live test exist. |
-| Perplexity | Unknown | Unknown | No documented remote MCP callback contract confirmed here | **Unknown** | Verify current Perplexity docs | Do not claim support until docs and a live test exist. |
-| Abacus | Unknown | Unknown | No documented remote MCP callback contract confirmed here | **Unknown** | Verify current Abacus docs | Do not claim support until docs and a live test exist. |
+| Claude.ai hosted connectors | Remote MCP over HTTP | OAuth + PKCE + DCR or CIMD | `https://claude.ai/api/mcp/auth_callback` | **Expected** | [Anthropic custom connectors guide](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp) | Documented hosted callback is allowlisted. End-to-end verification is still recommended. |
+| Local IDE / CLI MCP clients | Streamable HTTP | OAuth via loopback callback | Generic loopback redirects on `http://localhost:<port>/...`, `http://127.0.0.1:<port>/...`, and `http://[::1]:<port>/...` | **Expected** | See your client's local MCP docs | Covers clients that use local browser/loopback OAuth callbacks. MemHeaven does not need brand-specific localhost logic for these. |
+| VS Code / GitHub Copilot MCP | HTTP MCP / Streamable HTTP-style remote server support | OAuth / DCR | `https://vscode.dev/redirect` | **Experimental** | [VS Code MCP docs](https://code.visualstudio.com/docs/copilot/customization/mcp-servers) | Existing documented callback remains allowlisted. No broader editor-domain expansion is enabled. |
+| Grok / xAI | Remote MCP | Authorization header | No documented hosted OAuth callback contract. Use the MemHeaven `/mcp` URL and `Authorization: Bearer <token>` when the host supports custom headers. | **Expected with bearer/header auth** | xAI Remote MCP tooling docs | MemHeaven accepts bearer tokens for `/mcp`, but there is no public scripted flow yet for minting a bearer token outside the normal OAuth connector flow. |
+| Perplexity | N/A as hosted MemHeaven client | N/A | Current public docs describe Perplexity as an MCP server for other clients, not as a hosted third-party remote MCP client target. | **Not applicable** | Perplexity public MCP docs | No allowlist entry. |
+| Abacus | Unknown | Unknown | No exact hosted callback or bearer/header contract confirmed. | **Unknown** | Verify current Abacus docs before rollout | No allowlist entry. |
 
 ## Current documented callback allowlist
 
@@ -50,8 +41,7 @@ MemHeaven currently keeps hosted callback support to exact documented hosted con
 ^https://chatgpt\.com/connector/oauth/[A-Za-z0-9_-]+$
 ^https://chatgpt\.com/connector_platform_oauth_redirect$
 ^https://vscode\.dev/redirect$
-^http://127\.0\.0\.1:33418/?$
-loopback http redirects on localhost / 127.0.0.1 / [::1] for local development
+loopback http redirects on localhost / 127.0.0.1 / [::1] with any port and path for local IDE, CLI, and browser OAuth flows
 ```
 
 Warnings:
@@ -60,14 +50,21 @@ Warnings:
 - do **not** allow broad `https://claude.ai/.*`
 - do **not** allow broad `https://vscode.dev/.*`
 - do **not** allow broad custom schemes
+- do **not** add speculative hosted OAuth domains such as `grok.com`, `x.ai`, `api.x.ai`, `perplexity.ai`, or `abacus.ai`
 - do **not** pre-allowlist clients with undocumented callback contracts
+
+## Grok / xAI note
+
+Current public xAI Remote MCP material points to remote MCP connections that can send authorization headers. That makes Grok/xAI a bearer/header integration question, not a hosted OAuth callback allowlist question.
+
+MemHeaven already accepts `Authorization: Bearer <token>` on `/mcp`. What is still missing is a small public operator-facing guide for minting a bearer token specifically for non-OAuth hosts.
 
 ## Practical recommendation
 
 Prioritize compatibility work in this order:
 
 1. **ChatGPT** as the confirmed hosted-client starting point
-2. **Claude.ai / Claude Desktop / Claude Code** because the callback contracts are documented and narrowly allowlisted
-3. **VS Code / Copilot** as the next experimental target because its documented callbacks are now allowlisted
-
-Everything else should remain experimental or unknown until a stable callback contract and a live end-to-end test exist.
+2. **Claude.ai hosted connectors** because the callback contract is documented and narrowly allowlisted
+3. **Local IDE / CLI clients** that use loopback OAuth callbacks
+4. **VS Code / Copilot** as a narrower experimental hosted target because `https://vscode.dev/redirect` is already allowlisted
+5. **Grok / xAI** only through explicit bearer/header support, not through new redirect allowlist entries

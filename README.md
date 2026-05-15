@@ -84,12 +84,11 @@ If you want the hand-holding version, use [`docs/GETTING_STARTED_FROM_ZERO.md`](
 | Client | Status | Notes |
 | --- | --- | --- |
 | ChatGPT | **Confirmed** | Manually verified end-to-end for the `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call |
-| Claude.ai remote connectors | **Expected** | Protocol-compatible; Anthropic's documented hosted callback is allowlisted, but end-to-end verification is still needed |
-| Claude Desktop remote connectors | **Expected** | Same hosted callback story as Claude.ai |
-| Claude Code | **Expected** | Loopback callback model fits MemHeaven's localhost allowance |
-| Cursor | **Experimental** | Needs verified callback policy before claiming support |
-| VS Code / GitHub Copilot MCP | **Experimental** | Documented VS Code callbacks are allowlisted, but hosted OAuth still needs a live MemHeaven verification |
-| Windsurf / Cline / Roo Code / Gemini CLI / OpenCode / Grok | **Unknown** | Do not market as supported until callback and auth behavior are verified |
+| Claude.ai hosted connectors | **Expected** | Anthropic's documented hosted callback is allowlisted, but end-to-end verification is still needed |
+| Local IDE / CLI MCP clients | **Expected** | Generic localhost / 127.0.0.1 / [::1] loopback OAuth callbacks are already allowed |
+| VS Code / GitHub Copilot MCP | **Experimental** | Existing `https://vscode.dev/redirect` support remains allowlisted, but hosted OAuth still needs a live MemHeaven verification |
+| Grok / xAI | **Expected with bearer/header auth** | Treat as an `Authorization: Bearer <token>` integration for `/mcp`, not as a hosted OAuth callback allowlist target |
+| Perplexity / Abacus | **Not applicable / Unknown** | No confirmed hosted-client callback contract is allowlisted |
 
 Full details: [`docs/CLIENT_COMPATIBILITY.md`](docs/CLIENT_COMPATIBILITY.md)
 
@@ -410,7 +409,7 @@ npx wrangler deploy
 
 ChatGPT has been manually verified end-to-end for MemHeaven's `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call. That confirms the main hosted-client path without claiming that every ChatGPT plan or workspace supports custom MCP connectors.
 
-Redirect URIs are intentionally restricted to documented ChatGPT, Claude, and VS Code callback contracts plus localhost loopback flows for development.
+Redirect URIs are intentionally restricted to documented ChatGPT, Claude, and VS Code callback contracts plus generic localhost loopback flows. Non-OAuth hosts can only work when they can call `/mcp` with `Authorization: Bearer <token>`.
 
 ## Smoke scripts
 

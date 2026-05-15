@@ -69,8 +69,7 @@ If you expand redirect support for additional MCP clients, prefer a **narrow all
 ^https://chatgpt\.com/connector/oauth/[A-Za-z0-9_-]+$
 ^https://chatgpt\.com/connector_platform_oauth_redirect$
 ^https://vscode\.dev/redirect$
-^http://127\.0\.0\.1:33418/?$
-loopback http redirects on localhost / 127.0.0.1 / [::1] for local development
+loopback http redirects on localhost / 127.0.0.1 / [::1] with any port and path for local IDE, CLI, and browser OAuth flows
 ```
 
 ### Do not do this
@@ -78,6 +77,7 @@ loopback http redirects on localhost / 127.0.0.1 / [::1] for local development
 - Do **not** allow broad `https://chatgpt.com/.*`
 - Do **not** allow broad `https://claude.ai/.*`
 - Do **not** allow broad `https://vscode.dev/.*`
+- Do **not** add speculative hosted domains such as `grok.com`, `x.ai`, `api.x.ai`, `perplexity.ai`, or `abacus.ai`
 - Do **not** allow broad custom schemes
 - Do **not** pre-allowlist clients with undocumented callback contracts
 
