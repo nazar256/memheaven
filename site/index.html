@@ -112,12 +112,13 @@
         <h1>MemHeaven</h1>
         <p class="headline">Bring <a class="link" href="https://github.com/mempalace/mempalace">MemPalace</a>-style long-term memory to ChatGPT and remote AI agents.</p>
         <p>MemHeaven is a self-hosted remote MCP memory server that gives hosted AI clients searchable long-term memory you own.</p>
-        <p><strong>Deploy on a Cloudflare Free account.</strong> No VM, no Docker, no database admin. Free-tier limits apply, and heavier usage may require paid Cloudflare usage.</p>
+        <p>Self-host on Cloudflare without a VM, Docker, or database admin. Free-tier limits apply, and heavier usage may require paid Cloudflare usage.</p>
         <div class="cta-row">
           <a class="button" href="https://github.com/nazar256/memheaven#fastest-happy-path">Quickstart</a>
-          <a class="button secondary" href="https://github.com/nazar256/memheaven/blob/main/docs/GETTING_STARTED_FROM_ZERO.md">Getting started from zero</a>
           <a class="button secondary" href="https://github.com/nazar256/memheaven/blob/main/docs/CLIENT_COMPATIBILITY.md">Client compatibility</a>
+          <a class="button secondary" href="https://github.com/nazar256/memheaven/blob/main/docs/AGENT_MEMORY_PROTOCOL.md">Agent memory protocol</a>
           <a class="button secondary" href="https://github.com/nazar256/memheaven/blob/main/docs/SECURITY.md">Security model</a>
+          <a class="button secondary" href="https://github.com/nazar256/memheaven">GitHub repository</a>
         </div>
       </section>
 
@@ -148,21 +149,20 @@
       </section>
 
       <section>
-        <h2>Inspired by MemPalace</h2>
+        <h2>Inspiration and credits</h2>
         <p>MemHeaven is inspired by <a class="link" href="https://github.com/mempalace/mempalace">MemPalace</a>, the open-source local-first AI memory project that helped show how useful verbatim, searchable long-term memory can be for AI agents.</p>
-        <p>MemHeaven explores a different deployment shape: remote MCP memory for hosted clients and trusted shared setups.</p>
+        <p>With respect and thanks to the MemPalace project for the original memory model inspiration. MemPalace repository: <a class="link" href="https://github.com/mempalace/mempalace">github.com/mempalace/mempalace</a></p>
       </section>
 
       <section>
-        <h2>Credits</h2>
-        <p>With respect and thanks to the MemPalace project for the original memory model inspiration.</p>
-        <p>MemPalace repository: <a class="link" href="https://github.com/mempalace/mempalace">github.com/mempalace/mempalace</a></p>
-      </section>
-
-      <section>
-        <h2>Get started</h2>
-        <p>Use <code>npm run init -- --base-url https://your-domain.example</code>, then generate secrets, create your first access key, deploy, and connect a client to <code>/mcp</code>.</p>
-        <p><a class="link" href="https://github.com/nazar256/memheaven">View the GitHub repository →</a></p>
+        <h2>Documentation</h2>
+        <div class="grid">
+          <div class="card"><strong>Quickstart.</strong><p><a class="link" href="https://github.com/nazar256/memheaven#fastest-happy-path">Fastest happy path</a> for self-hosting your own instance.</p></div>
+          <div class="card"><strong>Client compatibility.</strong><p><a class="link" href="https://github.com/nazar256/memheaven/blob/main/docs/CLIENT_COMPATIBILITY.md">See confirmed, expected, experimental, and unknown clients</a>.</p></div>
+          <div class="card"><strong>Agent memory protocol.</strong><p><a class="link" href="https://github.com/nazar256/memheaven/blob/main/docs/AGENT_MEMORY_PROTOCOL.md">Copy-paste guidance</a> for when agents should read or write memory.</p></div>
+          <div class="card"><strong>Security model.</strong><p><a class="link" href="https://github.com/nazar256/memheaven/blob/main/docs/SECURITY.md">Review auth, tenancy, and storage boundaries</a>.</p></div>
+          <div class="card"><strong>GitHub repository.</strong><p><a class="link" href="https://github.com/nazar256/memheaven">Browse code, issues, and self-hosting docs</a>.</p></div>
+        </div>
       </section>
 
       <footer>

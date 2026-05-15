@@ -2,6 +2,12 @@ import type { AppConfig } from '../config';
 import { sha256Base64Url } from './crypto';
 
 const LOCALHOST_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
+const EXACT_HTTPS_REDIRECT_URIS = new Set([
+  'https://chatgpt.com/connector_platform_oauth_redirect',
+  'https://claude.ai/api/mcp/auth_callback',
+  'https://vscode.dev/redirect',
+]);
+const CHATGPT_CONNECTOR_REDIRECT_PATH = /^\/connector\/oauth\/[A-Za-z0-9_-]+$/;
 
 export function sanitizeSimpleText(value: string, label: string, maxLength = 80): string {
   const sanitized = value.trim().replace(/\s+/g, ' ');
@@ -56,10 +62,14 @@ export function canonicalizeRedirectUri(value: string): string {
 export function isAllowedRedirectUri(value: string): boolean {
   const url = new URL(value);
   if (url.protocol === 'https:') {
-    if (url.hostname === 'chatgpt.com' && url.pathname.startsWith('/connector/oauth/')) {
+    if (EXACT_HTTPS_REDIRECT_URIS.has(url.toString())) {
       return true;
     }
-    if (url.hostname === 'chatgpt.com' && url.pathname === '/connector_platform_oauth_redirect') {
+    if (
+      url.origin === 'https://chatgpt.com'
+      && !url.search
+      && CHATGPT_CONNECTOR_REDIRECT_PATH.test(url.pathname)
+    ) {
       return true;
     }
     return false;

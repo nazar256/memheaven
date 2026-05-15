@@ -83,11 +83,11 @@ If you want the hand-holding version, use [`docs/GETTING_STARTED_FROM_ZERO.md`](
 | Client | Status | Notes |
 | --- | --- | --- |
 | ChatGPT | **Confirmed** | Manually verified end-to-end for the `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call |
-| Claude.ai remote connectors | **Expected** | Protocol-compatible, but callback allowlist expansion is needed first |
+| Claude.ai remote connectors | **Expected** | Protocol-compatible; Anthropic's documented hosted callback is allowlisted, but end-to-end verification is still needed |
 | Claude Desktop remote connectors | **Expected** | Same hosted callback story as Claude.ai |
 | Claude Code | **Expected** | Loopback callback model fits MemHeaven's localhost allowance |
 | Cursor | **Experimental** | Needs verified callback policy before claiming support |
-| VS Code / GitHub Copilot MCP | **Experimental** | MCP support exists, hosted OAuth path still needs a live MemHeaven verification |
+| VS Code / GitHub Copilot MCP | **Experimental** | Documented VS Code callbacks are allowlisted, but hosted OAuth still needs a live MemHeaven verification |
 | Windsurf / Cline / Roo Code / Gemini CLI / OpenCode / Grok | **Unknown** | Do not market as supported until callback and auth behavior are verified |
 
 Full details: [`docs/CLIENT_COMPATIBILITY.md`](docs/CLIENT_COMPATIBILITY.md)
@@ -132,13 +132,12 @@ We see that as complementary to MemPalace’s on-device approach, not a replacem
 - Vectorize performs semantic search over chunked memory content.
 - Access keys gate authorization and map users to tenant-scoped memory.
 
-## Full deployment docs
+## Documentation
 
 - [`docs/GETTING_STARTED_FROM_ZERO.md`](docs/GETTING_STARTED_FROM_ZERO.md)
 - [`docs/CLIENT_COMPATIBILITY.md`](docs/CLIENT_COMPATIBILITY.md)
 - [`docs/AGENT_MEMORY_PROTOCOL.md`](docs/AGENT_MEMORY_PROTOCOL.md)
 - [`docs/SECURITY.md`](docs/SECURITY.md)
-- [`docs/LAUNCH.md`](docs/LAUNCH.md)
 
 ## What is included
 
@@ -167,7 +166,7 @@ We see that as complementary to MemPalace’s on-device approach, not a replacem
 | GET | `/.well-known/oauth-protected-resource` | Protected resource metadata |
 | GET | `/.well-known/oauth-protected-resource/mcp` | MCP protected resource metadata |
 | POST | `/register` | Dynamic client registration |
-| GET / POST | `/authorize` | Consent page and access-key submission |
+| GET / POST | `/authorize` | Consent page and access-key entry |
 | POST | `/token` | Authorization-code and refresh-token exchange |
 | GET / POST / DELETE | `/mcp` | Authenticated Streamable HTTP MCP endpoint |
 
@@ -196,7 +195,7 @@ All exposed MCP tools also advertise structured `outputSchema` metadata so ChatG
 
 ## Quickstart
 
-This is the happy path for a new self-hosted deployment.
+This is the fastest happy path for self-hosting MemHeaven.
 
 1. Install dependencies:
 
@@ -405,7 +404,7 @@ npx wrangler deploy
 
 ChatGPT has been manually verified end-to-end for MemHeaven's `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call. That confirms the main hosted-client path without claiming that every ChatGPT plan or workspace supports custom MCP connectors.
 
-Redirect URIs are intentionally restricted to ChatGPT callback URLs and localhost for development in the current repo defaults.
+Redirect URIs are intentionally restricted to documented ChatGPT, Claude, and VS Code callback contracts plus localhost loopback flows for development.
 
 ## Smoke scripts
 
@@ -462,7 +461,7 @@ The service does not trust client-supplied tenant information; isolation comes f
 - Refresh tokens are revoked by access-key removal, not individual refresh-token storage.
 - Embeddings use `@cf/baai/bge-small-en-v1.5`, so long drawer bodies are chunked before indexing.
 - Vectorize dimensions are locked to the configured index (`384` for the default MVP setup).
-- The current repo defaults are ChatGPT-first. Other hosted clients may need callback allowlist expansion before they work end-to-end.
+- Hosted-client callback support stays narrow and contract-driven. Other clients may need explicit callback allowlist additions before they work end-to-end.
 
 ## Related docs
 
@@ -470,7 +469,6 @@ The service does not trust client-supplied tenant information; isolation comes f
 - `docs/CLIENT_COMPATIBILITY.md`
 - `docs/AGENT_MEMORY_PROTOCOL.md`
 - `docs/SECURITY.md`
-- `docs/LAUNCH.md`
 - `docs/PRODUCT_REQUIREMENTS.md`
 - `docs/IMPLEMENTATION_PLAN.md`
 - `docs/PROJECT_STATE.md`

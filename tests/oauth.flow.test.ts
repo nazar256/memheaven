@@ -23,22 +23,42 @@ async function issueAuthorizePage(config: ReturnType<typeof requireConfig>, clie
 }
 
 describe('oauth flow', async () => {
-  it('registers a valid client and rejects a bad redirect', async () => {
+  it('registers documented hosted and loopback redirects and rejects bad redirect contracts', async () => {
     const env = await createEnvWithKeys();
     const config = requireConfig(env);
-    const ok = await handleRegister(new Request('https://memory.example.com/register', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ redirect_uris: [redirectUri] }),
-    }), config);
-    expect(ok.status).toBe(201);
+    const allowedRedirects = [
+      redirectUri,
+      'https://chatgpt.com/connector/oauth/test-client',
+      'https://claude.ai/api/mcp/auth_callback',
+      'https://vscode.dev/redirect',
+      'http://127.0.0.1:33418',
+    ];
 
-    const bad = await handleRegister(new Request('https://memory.example.com/register', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ redirect_uris: ['https://evil.example.com/callback'] }),
-    }), config);
-    expect(bad.status).toBe(400);
+    for (const allowedRedirect of allowedRedirects) {
+      const ok = await handleRegister(new Request('https://memory.example.com/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ redirect_uris: [allowedRedirect] }),
+      }), config);
+      expect(ok.status, allowedRedirect).toBe(201);
+    }
+
+    const rejectedRedirects = [
+      'https://evil.example.com/callback',
+      'https://claude.ai/evil',
+      'https://vscode.dev/evil',
+      'https://chatgpt.com/connector/oauth/test-client/evil',
+      'https://x.ai/oauth/callback',
+    ];
+
+    for (const rejectedRedirect of rejectedRedirects) {
+      const bad = await handleRegister(new Request('https://memory.example.com/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ redirect_uris: [rejectedRedirect] }),
+      }), config);
+      expect(bad.status, rejectedRedirect).toBe(400);
+    }
   });
 
   it('rejects removed keys during refresh token exchange', async () => {

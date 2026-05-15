@@ -30,7 +30,7 @@ Helpful links:
 - [Anthropic remote MCP custom connectors](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp)
 - [Claude Code MCP docs](https://code.claude.com/docs/claude-code/mcp)
 
-> Note: ChatGPT setup is supported and documented in this repo, but a stable public OpenAI help/doc URL for custom MCP setup should be rechecked at launch time.
+> Note: ChatGPT setup is supported and documented in this repo, but OpenAI's public help/docs for custom MCP setup may change over time.
 
 ## 1. Create a Cloudflare account
 
@@ -198,14 +198,14 @@ MemHeaven's ChatGPT path has been manually verified narrowly for the `/mcp` URL,
 
 ### Claude-family hosted connectors (expected / experimental)
 
-MemHeaven is protocol-compatible with hosted remote MCP clients, but the repository defaults are currently **ChatGPT-first**.
+MemHeaven is protocol-compatible with hosted remote MCP clients, and the current callback allowlist includes Anthropic's documented hosted callback plus localhost loopback flows.
 
 Before using Claude.ai or Claude Desktop remote connectors, review:
 
 - [`docs/CLIENT_COMPATIBILITY.md`](CLIENT_COMPATIBILITY.md)
 - [`docs/SECURITY.md`](SECURITY.md)
 
-If you expand the redirect allowlist to include Claude's callback, use the same `/mcp` URL and the same `raw_key` authorization flow.
+Use the same `/mcp` URL and the same `raw_key` authorization flow. The hosted callback contract currently allowlisted is `https://claude.ai/api/mcp/auth_callback`.
 
 ### Claude Code (expected)
 
@@ -273,4 +273,3 @@ MemHeaven is designed for personal use, family, friends, and other small trusted
 - [Client compatibility matrix](CLIENT_COMPATIBILITY.md)
 - [Agent memory protocol](AGENT_MEMORY_PROTOCOL.md)
 - [Security model](SECURITY.md)
-- [Launch checklist](LAUNCH.md)

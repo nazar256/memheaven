@@ -2,7 +2,7 @@
 
 Internal handoff summary for future maintenance sessions.
 
-Public launch docs should treat `docs/PROJECT_STATE.md`, `README.md`, and `docs/LAUNCH.md` as the primary public-facing sources of truth.
+Public product docs should treat `docs/PROJECT_STATE.md` and `README.md` as the primary public-facing sources of truth.
 
 ## Current maintenance notes
 
