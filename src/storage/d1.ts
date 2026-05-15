@@ -1,4 +1,5 @@
 import type { D1DatabaseLike, PreparedStatementLike } from '../config';
+import type { StatementRunResult } from '../config';
 
 export function bindStatement(db: D1DatabaseLike, query: string, values: unknown[] = []): PreparedStatementLike {
   return db.prepare(query).bind(...values);
@@ -22,6 +23,14 @@ export async function execute(db: D1DatabaseLike, query: string, values: unknown
   if (!result.success) {
     throw new Error(result.error ?? 'D1 execution failed');
   }
+}
+
+export async function executeResult(db: D1DatabaseLike, query: string, values: unknown[] = []): Promise<StatementRunResult> {
+  const result = await bindStatement(db, query, values).run();
+  if (!result.success) {
+    throw new Error(result.error ?? 'D1 execution failed');
+  }
+  return result;
 }
 
 export async function executeBatch(db: D1DatabaseLike, statements: Array<{ query: string; values?: unknown[] }>): Promise<void> {

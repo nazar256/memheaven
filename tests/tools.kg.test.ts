@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { requireConfig } from '../src/config';
+import { addDrawer } from '../src/memory/drawers';
 import { kgAdd, kgInvalidate, kgQuery, kgStats, kgTimeline } from '../src/memory/kg';
 import { createEnvWithKeys, mintDirectAccessToken, verifyDirectAccessToken } from './helpers/testData';
 
@@ -21,5 +22,27 @@ describe('kg tools', async () => {
     const stats = await kgStats(env, auth);
     expect(stats.entities).toBeGreaterThanOrEqual(2);
     expect(stats.triples).toBe(1);
+  });
+
+  it('rejects source_drawer_id from another tenant', async () => {
+    const env = await createEnvWithKeys();
+    const config = requireConfig(env);
+    const authA = await verifyDirectAccessToken(env, await mintDirectAccessToken(env, 'tenant-a'));
+    const authB = await verifyDirectAccessToken(env, await mintDirectAccessToken(env, 'tenant-b'));
+
+    const foreignDrawer = await addDrawer(env, config, authB, {
+      wing: 'people',
+      room: 'friends',
+      content: 'Tenant B private memory',
+    });
+
+    await expect(
+      kgAdd(env, config, authA, {
+        subject: 'Yurii',
+        predicate: 'knows',
+        object: 'Friend',
+        source_drawer_id: foreignDrawer.drawer_id,
+      }),
+    ).rejects.toThrow('source_drawer_id must reference an existing drawer for this tenant');
   });
 });

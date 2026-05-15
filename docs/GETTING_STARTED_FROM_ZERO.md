@@ -149,7 +149,8 @@ npx wrangler secret put AUTH_KEY_PEPPER
 Use the same `AUTH_KEY_PEPPER` value you just uploaded:
 
 ```bash
-AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>' npm run keygen -- --tenant personal --label "Personal"
+export AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>'
+npm run keygen -- --tenant personal --label "Personal"
 ```
 
 This command:
@@ -254,7 +255,8 @@ The ideal behavior is:
 For a second person or memory space:
 
 ```bash
-AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>' npm run keygen -- --tenant friend --label "Friend"
+export AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>'
+npm run keygen -- --tenant friend --label "Friend"
 ```
 
 Give that person only their own new `raw_key`.

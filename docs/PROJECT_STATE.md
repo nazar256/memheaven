@@ -35,8 +35,6 @@ MVP for `memheaven`, a Cloudflare-native MemPalace-compatible remote MCP server 
 
 ## Remaining risks / watch items
 
-- Stateless auth codes are short-lived but not strictly one-time-use without durable state.
-- Refresh tokens are revoked at access-key granularity, not individually.
 - Vectorize indexing is eventually consistent, so semantic search may need a brief retry immediately after a write.
 - Cloudflare Vectorize metadata-index creation may transiently return 504 even when the index creation eventually completes; verify by retrying and checking for `metadata index already exists`.
 - If Vectorize metadata indexes are created after initial ingestion, operators must rerun the provided reindex workflow.

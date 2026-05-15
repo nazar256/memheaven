@@ -3,7 +3,7 @@ import type { ChunkedText, DrawerChunkRecord, DrawerRecord, DuplicateMatch, Sear
 import { writeAuditLog } from './audit';
 import { chunkText, estimateTokens } from './chunking';
 import { embedText, embedTexts } from './embeddings';
-import { ensureQuotaAvailable, incrementUsage } from './quotas';
+import { consumeQuotaReservation, incrementUsage, releaseQuotaReservation, reserveQuota } from './quotas';
 import { queryAll, queryFirst, execute, executeBatch, placeholders } from '../storage/d1';
 import { deleteText, getText, putText } from '../storage/r2';
 import { deleteVectors, queryVectors, upsertVectors, type VectorMetadata } from './vectorizeIndex';
@@ -119,51 +119,55 @@ async function ensureDrawerVectorMetadata(
     return { vectorRows: [] };
   }
 
-  await ensureQuotaAvailable(requireBinding(env.DB, 'DB'), config, tenantId, 'embedding_input_chars', chunks.reduce((sum, chunk) => sum + chunk.charCount, 0));
-  const embeddings = await embedTexts(env, config, chunks.map((chunk) => chunk.text));
+  const db = requireBinding(env.DB, 'DB');
+  const embeddingChars = chunks.reduce((sum, chunk) => sum + chunk.charCount, 0);
+  const reservationDay = await reserveQuota(db, config, tenantId, 'embedding_input_chars', embeddingChars);
+  try {
+    const embeddings = await embedTexts(env, config, chunks.map((chunk) => chunk.text));
 
-  const vectorRows: DrawerChunkRecord[] = [];
-  const vectors = await Promise.all(
-    chunks.map(async (chunk, index) => {
-      const embedding = embeddings[index];
-      if (!embedding) {
-        throw new Error(`Missing embedding for chunk ${chunk.chunkIndex}`);
-      }
-      const vectorId = await vectorIdFor(tenantId, drawerId, chunk.chunkIndex, contentHash);
-      const metadata: VectorMetadata = {
-        tenant_id: tenantId,
-        drawer_id: drawerId,
-        chunk_index: chunk.chunkIndex,
-        wing,
-        room,
-        kind: 'drawer',
-        created_at: createdAt,
-      };
-      vectorRows.push({
-        id: await deterministicId('chunk', [tenantId, drawerId, chunk.chunkIndex]),
-        tenant_id: tenantId,
-        drawer_id: drawerId,
-        chunk_index: chunk.chunkIndex,
-        vector_id: vectorId,
-        chunk_text: chunk.text,
-        chunk_chars: chunk.charCount,
-        created_at: createdAt,
-      });
-      return {
-        id: vectorId,
-        values: embedding,
-        metadata,
-      };
-    }),
-  );
+    const vectorRows: DrawerChunkRecord[] = [];
+    const vectors = await Promise.all(
+      chunks.map(async (chunk, index) => {
+        const embedding = embeddings[index];
+        if (!embedding) {
+          throw new Error(`Missing embedding for chunk ${chunk.chunkIndex}`);
+        }
+        const vectorId = await vectorIdFor(tenantId, drawerId, chunk.chunkIndex, contentHash);
+        const metadata: VectorMetadata = {
+          tenant_id: tenantId,
+          drawer_id: drawerId,
+          chunk_index: chunk.chunkIndex,
+          wing,
+          room,
+          kind: 'drawer',
+          created_at: createdAt,
+        };
+        vectorRows.push({
+          id: await deterministicId('chunk', [tenantId, drawerId, chunk.chunkIndex]),
+          tenant_id: tenantId,
+          drawer_id: drawerId,
+          chunk_index: chunk.chunkIndex,
+          vector_id: vectorId,
+          chunk_text: chunk.text,
+          chunk_chars: chunk.charCount,
+          created_at: createdAt,
+        });
+        return {
+          id: vectorId,
+          values: embedding,
+          metadata,
+        };
+      }),
+    );
 
-  await upsertVectors(env, tenantId, vectors);
-  await incrementUsage(requireBinding(env.DB, 'DB'), tenantId, {
-    vector_queries: 0,
-    embedding_input_chars: chunks.reduce((sum, chunk) => sum + chunk.charCount, 0),
-  });
+    await upsertVectors(env, tenantId, vectors);
+    await consumeQuotaReservation(db, tenantId, 'embedding_input_chars', embeddingChars, reservationDay);
 
-  return { vectorRows };
+    return { vectorRows };
+  } catch (error) {
+    await releaseQuotaReservation(db, tenantId, 'embedding_input_chars', embeddingChars, reservationDay);
+    throw error;
+  }
 }
 
 async function insertChunkRows(db: D1DatabaseLike, rows: DrawerChunkRecord[]): Promise<void> {
@@ -229,69 +233,75 @@ export async function addDrawer(env: AppEnv, config: AppConfig, auth: TenantAuth
     };
   }
 
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'memory_writes', 1);
+  const reservationDay = await reserveQuota(db, config, auth.tenantId, 'memory_writes', 1);
   const createdAt = nowIso();
   const chunks = chunkText(content);
   const tokenEstimate = estimateTokens(content);
   const r2Key = buildDrawerObjectKey(auth.tenantId, drawerId);
 
-  await putText(bucket, r2Key, content);
-  await incrementUsage(db, auth.tenantId, { memory_writes: 1, r2_writes: 1 });
+  try {
+    await putText(bucket, r2Key, content);
 
-  await execute(
-    db,
-    `insert into drawers(id, tenant_id, wing, room, hall, title, source_file, added_by, content_hash, r2_key, content_chars, token_estimate, created_at, updated_at, deleted_at)
-     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)
-     on conflict(id) do update set
-       wing = excluded.wing,
-       room = excluded.room,
-       hall = excluded.hall,
-       title = excluded.title,
-       source_file = excluded.source_file,
-       added_by = excluded.added_by,
-       content_hash = excluded.content_hash,
-       r2_key = excluded.r2_key,
-       content_chars = excluded.content_chars,
-       token_estimate = excluded.token_estimate,
-       updated_at = excluded.updated_at,
-       deleted_at = null`,
-    [
-      drawerId,
-      auth.tenantId,
+    await execute(
+      db,
+      `insert into drawers(id, tenant_id, wing, room, hall, title, source_file, added_by, content_hash, r2_key, content_chars, token_estimate, created_at, updated_at, deleted_at)
+       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, null)
+       on conflict(id) do update set
+         wing = excluded.wing,
+         room = excluded.room,
+         hall = excluded.hall,
+         title = excluded.title,
+         source_file = excluded.source_file,
+         added_by = excluded.added_by,
+         content_hash = excluded.content_hash,
+         r2_key = excluded.r2_key,
+         content_chars = excluded.content_chars,
+         token_estimate = excluded.token_estimate,
+         updated_at = excluded.updated_at,
+         deleted_at = null`,
+      [
+        drawerId,
+        auth.tenantId,
+        wing,
+        room,
+        null,
+        deriveTitle(content),
+        sourceFile ?? null,
+        addedBy ?? null,
+        contentHash,
+        r2Key,
+        content.length,
+        tokenEstimate,
+        createdAt,
+        createdAt,
+      ],
+    );
+
+    const { vectorRows } = await ensureDrawerVectorMetadata(env, config, auth.tenantId, drawerId, wing, room, contentHash, chunks, createdAt);
+    await insertChunkRows(db, vectorRows);
+    await consumeQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    await incrementUsage(db, auth.tenantId, { r2_writes: 1 });
+
+    await writeAuditLog(db, auth.tenantId, 'add_drawer', {
+      drawer_id: drawerId,
       wing,
       room,
-      null,
-      deriveTitle(content),
-      sourceFile ?? null,
-      addedBy ?? null,
-      contentHash,
-      r2Key,
-      content.length,
-      tokenEstimate,
-      createdAt,
-      createdAt,
-    ],
-  );
+      source_file: sourceFile,
+      added_by: addedBy,
+      content,
+    }, { success: true, chunks: chunks.length });
 
-  const { vectorRows } = await ensureDrawerVectorMetadata(env, config, auth.tenantId, drawerId, wing, room, contentHash, chunks, createdAt);
-  await insertChunkRows(db, vectorRows);
-
-  await writeAuditLog(db, auth.tenantId, 'add_drawer', {
-    drawer_id: drawerId,
-    wing,
-    room,
-    source_file: sourceFile,
-    added_by: addedBy,
-    content,
-  }, { success: true, chunks: chunks.length });
-
-  return {
-    success: true,
-    drawer_id: drawerId,
-    wing,
-    room,
-    chunks: chunks.length,
-  };
+    return {
+      success: true,
+      drawer_id: drawerId,
+      wing,
+      room,
+      chunks: chunks.length,
+    };
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    throw error;
+  }
 }
 
 export async function getDrawer(env: AppEnv, config: AppConfig, auth: TenantAuthContext, drawerId: string) {
@@ -412,56 +422,61 @@ export async function updateDrawer(env: AppEnv, config: AppConfig, auth: TenantA
     return { success: true, drawer_id: drawer.id, wing: drawer.wing, room: drawer.room, updated_fields: [] };
   }
 
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'memory_writes', 1);
+  const reservationDay = await reserveQuota(db, config, auth.tenantId, 'memory_writes', 1);
 
   const updatedAt = nowIso();
   const nextHash = contentChanged ? await sha256Hex(nextContent) : drawer.content_hash;
-  if (contentChanged) {
-    await putText(bucket, drawer.r2_key, nextContent);
+  try {
+    if (contentChanged) {
+      await putText(bucket, drawer.r2_key, nextContent);
+    }
+
+    await execute(
+      db,
+      `update drawers
+          set wing = ?, room = ?, source_file = ?, added_by = ?, title = ?, content_hash = ?, content_chars = ?, token_estimate = ?, updated_at = ?, deleted_at = null
+        where tenant_id = ? and id = ?`,
+      [
+        nextWing,
+        nextRoom,
+        sourceFile,
+        addedBy,
+        deriveTitle(nextContent),
+        nextHash,
+        nextContent.length,
+        estimateTokens(nextContent),
+        updatedAt,
+        auth.tenantId,
+        drawer.id,
+      ],
+    );
+
+    const refreshed: DrawerRecord = { ...drawer, wing: nextWing, room: nextRoom, source_file: sourceFile, added_by: addedBy, content_hash: nextHash, content_chars: nextContent.length, token_estimate: estimateTokens(nextContent), updated_at: updatedAt, title: deriveTitle(nextContent) };
+    let chunks = await listChunkRows(db, auth.tenantId, drawer.id).then((rows) => rows.length);
+    if (contentChanged || metadataChanged || forceReindex) {
+      chunks = await reindexDrawer(env, config, auth, refreshed, nextContent);
+    }
+    await consumeQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    await incrementUsage(db, auth.tenantId, {
+      r2_writes: contentChanged ? 1 : 0,
+      r2_reads: 1,
+    });
+
+    await writeAuditLog(db, auth.tenantId, 'update_drawer', { ...input, content: input.content }, { success: true, drawer_id: drawer.id, chunks });
+
+    const updatedFields = [
+      ...(contentChanged ? ['content'] : []),
+      ...(nextWing !== drawer.wing ? ['wing'] : []),
+      ...(nextRoom !== drawer.room ? ['room'] : []),
+      ...(sourceFile !== drawer.source_file ? ['source_file'] : []),
+      ...(addedBy !== drawer.added_by ? ['added_by'] : []),
+      ...(forceReindex ? ['reindex'] : []),
+    ];
+    return { success: true, drawer_id: drawer.id, wing: nextWing, room: nextRoom, updated_fields: updatedFields };
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    throw error;
   }
-
-  await execute(
-    db,
-    `update drawers
-        set wing = ?, room = ?, source_file = ?, added_by = ?, title = ?, content_hash = ?, content_chars = ?, token_estimate = ?, updated_at = ?, deleted_at = null
-      where tenant_id = ? and id = ?`,
-    [
-      nextWing,
-      nextRoom,
-      sourceFile,
-      addedBy,
-      deriveTitle(nextContent),
-      nextHash,
-      nextContent.length,
-      estimateTokens(nextContent),
-      updatedAt,
-      auth.tenantId,
-      drawer.id,
-    ],
-  );
-
-  const refreshed: DrawerRecord = { ...drawer, wing: nextWing, room: nextRoom, source_file: sourceFile, added_by: addedBy, content_hash: nextHash, content_chars: nextContent.length, token_estimate: estimateTokens(nextContent), updated_at: updatedAt, title: deriveTitle(nextContent) };
-  let chunks = await listChunkRows(db, auth.tenantId, drawer.id).then((rows) => rows.length);
-  if (contentChanged || metadataChanged || forceReindex) {
-    chunks = await reindexDrawer(env, config, auth, refreshed, nextContent);
-  }
-  await incrementUsage(db, auth.tenantId, {
-    memory_writes: 1,
-    r2_writes: contentChanged ? 1 : 0,
-    r2_reads: 1,
-  });
-
-  await writeAuditLog(db, auth.tenantId, 'update_drawer', { ...input, content: input.content }, { success: true, drawer_id: drawer.id, chunks });
-
-  const updatedFields = [
-    ...(contentChanged ? ['content'] : []),
-    ...(nextWing !== drawer.wing ? ['wing'] : []),
-    ...(nextRoom !== drawer.room ? ['room'] : []),
-    ...(sourceFile !== drawer.source_file ? ['source_file'] : []),
-    ...(addedBy !== drawer.added_by ? ['added_by'] : []),
-    ...(forceReindex ? ['reindex'] : []),
-  ];
-  return { success: true, drawer_id: drawer.id, wing: nextWing, room: nextRoom, updated_fields: updatedFields };
 }
 
 export async function deleteDrawer(env: AppEnv, config: AppConfig, auth: TenantAuthContext, drawerId: string) {
@@ -472,19 +487,24 @@ export async function deleteDrawer(env: AppEnv, config: AppConfig, auth: TenantA
     return { success: true, drawer_id: drawerId, already_deleted: true };
   }
 
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'memory_writes', 1);
+  const reservationDay = await reserveQuota(db, config, auth.tenantId, 'memory_writes', 1);
   const chunks = await listChunkRows(db, auth.tenantId, drawerId);
-  await deleteVectors(env, chunks.map((row) => row.vector_id));
-  await deleteChunkRows(db, auth.tenantId, drawerId);
-  await deleteText(bucket, drawer.r2_key);
-  await execute(
-    db,
-    `update drawers set deleted_at = ?, updated_at = ? where tenant_id = ? and id = ?`,
-    [nowIso(), nowIso(), auth.tenantId, drawerId],
-  );
-  await incrementUsage(db, auth.tenantId, { memory_writes: 1 });
-  await writeAuditLog(db, auth.tenantId, 'delete_drawer', { drawer_id: drawerId }, { success: true });
-  return { success: true, drawer_id: drawerId };
+  try {
+    await deleteVectors(env, chunks.map((row) => row.vector_id));
+    await deleteChunkRows(db, auth.tenantId, drawerId);
+    await deleteText(bucket, drawer.r2_key);
+    await execute(
+      db,
+      `update drawers set deleted_at = ?, updated_at = ? where tenant_id = ? and id = ?`,
+      [nowIso(), nowIso(), auth.tenantId, drawerId],
+    );
+    await consumeQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    await writeAuditLog(db, auth.tenantId, 'delete_drawer', { drawer_id: drawerId }, { success: true });
+    return { success: true, drawer_id: drawerId };
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    throw error;
+  }
 }
 
 export async function searchDrawers(env: AppEnv, config: AppConfig, auth: TenantAuthContext, input: SearchDrawersInput) {
@@ -495,19 +515,27 @@ export async function searchDrawers(env: AppEnv, config: AppConfig, auth: Tenant
     throw new Error('query is required');
   }
   const limit = Math.min(Math.max(1, input.limit ?? config.searchDefaultLimit), config.searchMaxLimit);
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'vector_queries', 1);
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'embedding_input_chars', query.length);
+  const vectorReservationDay = await reserveQuota(db, config, auth.tenantId, 'vector_queries', 1);
+  const embeddingReservationDay = await reserveQuota(db, config, auth.tenantId, 'embedding_input_chars', query.length);
 
-  const vector = await embedText(env, config, query);
-  const queryOptions = {
-    tenantId: auth.tenantId,
-    topK: limit,
-    kind: 'drawer' as const,
-    ...(input.wing ? { wing: input.wing } : {}),
-    ...(input.room ? { room: input.room } : {}),
-  };
-  const hits = await queryVectors(env, config, vector, queryOptions);
-  await incrementUsage(db, auth.tenantId, { vector_queries: 1, embedding_input_chars: query.length });
+  let hits;
+  try {
+    const vector = await embedText(env, config, query);
+    const queryOptions = {
+      tenantId: auth.tenantId,
+      topK: limit,
+      kind: 'drawer' as const,
+      ...(input.wing ? { wing: input.wing } : {}),
+      ...(input.room ? { room: input.room } : {}),
+    };
+    hits = await queryVectors(env, config, vector, queryOptions);
+    await consumeQuotaReservation(db, auth.tenantId, 'vector_queries', 1, vectorReservationDay);
+    await consumeQuotaReservation(db, auth.tenantId, 'embedding_input_chars', query.length, embeddingReservationDay);
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'vector_queries', 1, vectorReservationDay);
+    await releaseQuotaReservation(db, auth.tenantId, 'embedding_input_chars', query.length, embeddingReservationDay);
+    throw error;
+  }
 
   if (hits.length === 0) {
     return { query, filters: { wing: input.wing ?? null, room: input.room ?? null }, results: [] as SearchResultItem[] };
@@ -578,11 +606,19 @@ export async function checkDuplicate(env: AppEnv, config: AppConfig, auth: Tenan
     return { is_duplicate: true, matches };
   }
 
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'vector_queries', 1);
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'embedding_input_chars', content.length);
-  const vector = await embedText(env, config, content);
-  const hits = await queryVectors(env, config, vector, { tenantId: auth.tenantId, topK: 3, kind: 'drawer' });
-  await incrementUsage(db, auth.tenantId, { vector_queries: 1, embedding_input_chars: content.length });
+  const vectorReservationDay = await reserveQuota(db, config, auth.tenantId, 'vector_queries', 1);
+  const embeddingReservationDay = await reserveQuota(db, config, auth.tenantId, 'embedding_input_chars', content.length);
+  let hits;
+  try {
+    const vector = await embedText(env, config, content);
+    hits = await queryVectors(env, config, vector, { tenantId: auth.tenantId, topK: 3, kind: 'drawer' });
+    await consumeQuotaReservation(db, auth.tenantId, 'vector_queries', 1, vectorReservationDay);
+    await consumeQuotaReservation(db, auth.tenantId, 'embedding_input_chars', content.length, embeddingReservationDay);
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'vector_queries', 1, vectorReservationDay);
+    await releaseQuotaReservation(db, auth.tenantId, 'embedding_input_chars', content.length, embeddingReservationDay);
+    throw error;
+  }
   const vectorIds = hits.filter((hit) => hit.score >= threshold).map((hit) => hit.id);
   if (vectorIds.length === 0) {
     return { is_duplicate: false, matches: [] as DuplicateMatch[] };

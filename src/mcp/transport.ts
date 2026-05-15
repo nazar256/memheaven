@@ -1,7 +1,7 @@
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 
 import type { AppEnv } from '../config';
-import { ensureQuotaAvailable, incrementUsage } from '../memory/quotas';
+import { consumeQuotaReservation, releaseQuotaReservation, reserveQuota } from '../memory/quotas';
 import { createMcpServer } from './server';
 import { requireAuthenticatedMcpContext } from './context';
 import { forbiddenJsonResponse, internalJsonResponse, unauthorizedMcpResponse } from './errors';
@@ -174,9 +174,9 @@ export async function handleMcpRequest(request: Request, env: AppEnv): Promise<R
     return forbiddenJsonResponse(`Origin ${origin} is not allowed for /mcp`);
   }
 
+  let reservationDay: string;
   try {
-    await ensureQuotaAvailable(env.DB!, context.config, context.auth.tenantId, 'mcp_calls', 1);
-    await incrementUsage(env.DB!, context.auth.tenantId, { mcp_calls: 1 });
+    reservationDay = await reserveQuota(env.DB!, context.config, context.auth.tenantId, 'mcp_calls', 1);
   } catch (error) {
     return internalJsonResponse(error instanceof Error ? error.message : String(error), 429);
   }
@@ -195,12 +195,14 @@ export async function handleMcpRequest(request: Request, env: AppEnv): Promise<R
     await server.connect(transport);
     await bootstrapStatelessServer(server, request, payload);
     const response = await transport.handleRequest(request, payload === undefined ? undefined : { parsedBody: payload });
+      await consumeQuotaReservation(env.DB!, context.auth.tenantId, 'mcp_calls', 1, reservationDay);
     const contentType = response.headers.get('content-type') ?? '';
     if (contentType.includes('text/event-stream')) {
       return finalizeSseResponse(response, request, cleanup);
     }
     return finalizeJsonResponse(response, cleanup);
   } catch (error) {
+      await releaseQuotaReservation(env.DB!, context.auth.tenantId, 'mcp_calls', 1, reservationDay);
     await cleanup();
     return internalJsonResponse(error instanceof Error ? error.message : String(error));
   }

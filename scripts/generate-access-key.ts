@@ -147,10 +147,10 @@ function parseCliOptions(argv = process.argv.slice(2), cwd = process.cwd()): Par
   const pepper = values.pepper ?? process.env.AUTH_KEY_PEPPER;
 
   if (!tenant || !label) {
-    throw new Error('Usage: npm run keygen -- --tenant <tenant_id> --label <label> [--id <key_id>] [--scopes scope1,scope2] [--file .tmp/access-keys.json] [--no-sync] [--pepper <AUTH_KEY_PEPPER>]');
+    throw new Error('Usage: AUTH_KEY_PEPPER=<value> npm run keygen -- --tenant <tenant_id> --label <label> [--id <key_id>] [--scopes scope1,scope2] [--file .tmp/access-keys.json] [--no-sync] [--pepper <AUTH_KEY_PEPPER>]');
   }
   if (!pepper) {
-    throw new Error('AUTH_KEY_PEPPER is required via --pepper or environment');
+    throw new Error('AUTH_KEY_PEPPER is required via environment (preferred) or --pepper');
   }
 
   return {

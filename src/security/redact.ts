@@ -5,6 +5,7 @@ const SECRET_KEYS = new Set([
   'access_key',
   'accesskey',
   'raw_access_key',
+  'code',
   'code_verifier',
   'refresh_token',
   'access_token',
@@ -45,5 +46,10 @@ export function redactHeaders(headers: Headers): Record<string, string> {
 export function redactErrorMessage(message: string): string {
   return message
     .replace(/Bearer\s+[A-Za-z0-9._-]+/gu, 'Bearer [REDACTED]')
-    .replace(/access[_-]?key[^\s]*/giu, 'access_key=[REDACTED]');
+    .replace(/(access[_-]?key|code_verifier|refresh_token|access_token|code)=([^\s&]+)/giu, '$1=[REDACTED]')
+    .replace(/[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/gu, '[REDACTED_JWT]');
+}
+
+export function redactSecretLikeText(message: string): string {
+  return redactErrorMessage(message);
 }

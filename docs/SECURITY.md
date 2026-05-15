@@ -19,7 +19,7 @@ MemHeaven uses:
 - OAuth 2.1-style authorization flow
 - PKCE (`S256`)
 - dynamic client registration where supported
-- stateless JWT authorization codes, access tokens, and refresh tokens
+- short-lived JWT authorization codes, access tokens, and refresh tokens
 - an invite/access-key gate on the consent page
 
 The human user authorizes a client by pasting a raw access key into `/authorize`. The server hashes that input with `AUTH_KEY_PEPPER`, compares it to the active records in `ACCESS_KEYS_JSON`, and issues tenant-scoped tokens only when the key matches.
@@ -91,10 +91,10 @@ Stored memory can contain attacker-controlled text. Treat retrieved memory as co
 
 The project is designed for one operator and a small number of trusted users. If you need strong blast-radius reduction between unrelated organizations, separate deployments are safer than one shared deployment.
 
-### Stateless OAuth tradeoffs
+### OAuth session lifecycle
 
-- auth codes are short-lived, but not strictly one-time-use without durable state
-- refresh tokens are revoked at the access-key level, not individually
+- auth codes are short-lived and single-use
+- refresh tokens rotate with replay detection
 - removing or deactivating a key invalidates future token checks for that key
 
 ## Operational advice
@@ -102,5 +102,6 @@ The project is designed for one operator and a small number of trusted users. If
 - Use `npm run secrets:generate` for valid key material
 - Use `npm run keygen` so key records are hashed and synced consistently
 - Verify `/health` after deploy before connecting a client
+- Prefer environment variables or secure prompts over command-line flags for secrets and bearer tokens
 - Keep logs, screenshots, and bug reports free of raw keys and bearer tokens
 - Review [`docs/CLIENT_COMPATIBILITY.md`](CLIENT_COMPATIBILITY.md) before enabling new hosted clients

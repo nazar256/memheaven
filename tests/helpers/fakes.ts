@@ -4,12 +4,48 @@ type CounterRow = {
   tenant_id: string;
   day: string;
   mcp_calls: number;
+  reserved_mcp_calls: number;
   memory_reads: number;
   memory_writes: number;
+  reserved_memory_writes: number;
   vector_queries: number;
+  reserved_vector_queries: number;
   embedding_input_chars: number;
+  reserved_embedding_input_chars: number;
   r2_reads: number;
   r2_writes: number;
+};
+
+type AuthorizationCodeUse = {
+  jti: string;
+  client_id: string;
+  expires_at: number;
+  consumed_at: number;
+};
+
+type RefreshSession = {
+  session_id: string;
+  tenant_id: string;
+  client_id: string;
+  subject: string;
+  expires_at: number;
+  revoked_at: number | null;
+};
+
+type RefreshTokenState = {
+  jti: string;
+  session_id: string;
+  client_id: string;
+  parent_jti: string | null;
+  expires_at: number;
+  consumed_at: number | null;
+  replaced_by_jti: string | null;
+};
+
+type AuthRateLimitRow = {
+  bucket: string;
+  window_started_at: number;
+  count: number;
 };
 
 type Drawer = {
@@ -108,6 +144,10 @@ type MemoryStore = {
   tunnels: Tunnel[];
   usage_counters: CounterRow[];
   write_audit_log: Audit[];
+  oauth_authorization_codes: AuthorizationCodeUse[];
+  oauth_refresh_sessions: RefreshSession[];
+  oauth_refresh_tokens: RefreshTokenState[];
+  auth_rate_limits: AuthRateLimitRow[];
 };
 
 class FakeStatement implements PreparedStatementLike {
@@ -132,8 +172,16 @@ class FakeStatement implements PreparedStatementLike {
   }
 
   async run(): Promise<StatementRunResult> {
-    this.execute<void>();
-    return { success: true };
+    try {
+      this.execute<void>();
+      return { success: true, meta: { changes: 1 } };
+    } catch (error) {
+      const meta = (error as { meta?: Record<string, unknown> }).meta;
+      if (meta?.changes === 0) {
+        return { success: true, meta };
+      }
+      throw error;
+    }
   }
 
   private execute<T>(): T[] {
@@ -142,7 +190,94 @@ class FakeStatement implements PreparedStatementLike {
       const [tenantId, day] = this.values as [string, string];
       return this.store.usage_counters.filter((row) => row.tenant_id === tenantId && row.day === day) as T[];
     }
+    if (query.startsWith('select window_started_at, count from auth_rate_limits where bucket = ?')) {
+      const [bucket] = this.values as [string];
+      return this.store.auth_rate_limits.filter((row) => row.bucket === bucket) as T[];
+    }
+    if (query.startsWith('insert into auth_rate_limits')) {
+      const [bucket, windowStartedAt, limit] = this.values as [string, number, number];
+      const row = this.store.auth_rate_limits.find((item) => item.bucket === bucket);
+      if (!row) {
+        this.store.auth_rate_limits.push({ bucket, window_started_at: windowStartedAt, count: 1 });
+        return [];
+      }
+      if (row.window_started_at !== windowStartedAt) {
+        row.window_started_at = windowStartedAt;
+        row.count = 1;
+        return [];
+      }
+      if (row.count >= limit) {
+        throw Object.assign(new Error('rate limit conflict'), { meta: { changes: 0 } });
+      }
+      row.count += 1;
+      return [];
+    }
     if (query.startsWith('insert into usage_counters')) {
+      const isReservationInsert = query.includes('where (mcp_calls + reserved_mcp_calls + ?) <= ?')
+        || query.includes('where (memory_writes + reserved_memory_writes + ?) <= ?')
+        || query.includes('where (vector_queries + reserved_vector_queries + ?) <= ?')
+        || query.includes('where (embedding_input_chars + reserved_embedding_input_chars + ?) <= ?');
+
+      if (isReservationInsert) {
+        const [tenantId, day, reservedMcp, reservedWrites, reservedVq, reservedChars] = this.values as [string, string, number, number, number, number, number, number];
+        const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
+        if (row) {
+          if (query.includes('where (mcp_calls + reserved_mcp_calls + ?) <= ?')) {
+            const amount = this.values.at(-2) as number;
+            const max = this.values.at(-1) as number;
+            if (row.mcp_calls + row.reserved_mcp_calls + amount > max) {
+              throw Object.assign(new Error('quota conflict'), { meta: { changes: 0 } });
+            }
+            row.reserved_mcp_calls += reservedMcp;
+            return [];
+          }
+          if (query.includes('where (memory_writes + reserved_memory_writes + ?) <= ?')) {
+            const amount = this.values.at(-2) as number;
+            const max = this.values.at(-1) as number;
+            if (row.memory_writes + row.reserved_memory_writes + amount > max) {
+              throw Object.assign(new Error('quota conflict'), { meta: { changes: 0 } });
+            }
+            row.reserved_memory_writes += reservedWrites;
+            return [];
+          }
+          if (query.includes('where (vector_queries + reserved_vector_queries + ?) <= ?')) {
+            const amount = this.values.at(-2) as number;
+            const max = this.values.at(-1) as number;
+            if (row.vector_queries + row.reserved_vector_queries + amount > max) {
+              throw Object.assign(new Error('quota conflict'), { meta: { changes: 0 } });
+            }
+            row.reserved_vector_queries += reservedVq;
+            return [];
+          }
+          if (query.includes('where (embedding_input_chars + reserved_embedding_input_chars + ?) <= ?')) {
+            const amount = this.values.at(-2) as number;
+            const max = this.values.at(-1) as number;
+            if (row.embedding_input_chars + row.reserved_embedding_input_chars + amount > max) {
+              throw Object.assign(new Error('quota conflict'), { meta: { changes: 0 } });
+            }
+            row.reserved_embedding_input_chars += reservedChars;
+            return [];
+          }
+        } else {
+          this.store.usage_counters.push({
+            tenant_id: tenantId,
+            day,
+            mcp_calls: 0,
+            reserved_mcp_calls: reservedMcp,
+            memory_reads: 0,
+            memory_writes: 0,
+            reserved_memory_writes: reservedWrites,
+            vector_queries: 0,
+            reserved_vector_queries: reservedVq,
+            embedding_input_chars: 0,
+            reserved_embedding_input_chars: reservedChars,
+            r2_reads: 0,
+            r2_writes: 0,
+          });
+        }
+        return [];
+      }
+
       const [tenantId, day, mcp, reads, writes, vq, chars, r2r, r2w] = this.values as [string, string, number, number, number, number, number, number, number];
       const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
       if (row) {
@@ -154,13 +289,113 @@ class FakeStatement implements PreparedStatementLike {
         row.r2_reads += r2r;
         row.r2_writes += r2w;
       } else {
-        this.store.usage_counters.push({ tenant_id: tenantId, day, mcp_calls: mcp, memory_reads: reads, memory_writes: writes, vector_queries: vq, embedding_input_chars: chars, r2_reads: r2r, r2_writes: r2w });
+        this.store.usage_counters.push({ tenant_id: tenantId, day, mcp_calls: mcp, reserved_mcp_calls: 0, memory_reads: reads, memory_writes: writes, reserved_memory_writes: 0, vector_queries: vq, reserved_vector_queries: 0, embedding_input_chars: chars, reserved_embedding_input_chars: 0, r2_reads: r2r, r2_writes: r2w });
       }
+      return [];
+    }
+    if (query.startsWith('update usage_counters set reserved_mcp_calls = max(0, reserved_mcp_calls - ?), mcp_calls = mcp_calls + ?')) {
+      const [amount, consumed, tenantId, day] = this.values as [number, number, string, string];
+      const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
+      if (row) {
+        row.reserved_mcp_calls = Math.max(0, row.reserved_mcp_calls - amount);
+        row.mcp_calls += consumed;
+      }
+      return [];
+    }
+    if (query.startsWith('update usage_counters set reserved_memory_writes = max(0, reserved_memory_writes - ?), memory_writes = memory_writes + ?')) {
+      const [amount, consumed, tenantId, day] = this.values as [number, number, string, string];
+      const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
+      if (row) {
+        row.reserved_memory_writes = Math.max(0, row.reserved_memory_writes - amount);
+        row.memory_writes += consumed;
+      }
+      return [];
+    }
+    if (query.startsWith('update usage_counters set reserved_vector_queries = max(0, reserved_vector_queries - ?), vector_queries = vector_queries + ?')) {
+      const [amount, consumed, tenantId, day] = this.values as [number, number, string, string];
+      const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
+      if (row) {
+        row.reserved_vector_queries = Math.max(0, row.reserved_vector_queries - amount);
+        row.vector_queries += consumed;
+      }
+      return [];
+    }
+    if (query.startsWith('update usage_counters set reserved_embedding_input_chars = max(0, reserved_embedding_input_chars - ?), embedding_input_chars = embedding_input_chars + ?')) {
+      const [amount, consumed, tenantId, day] = this.values as [number, number, string, string];
+      const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
+      if (row) {
+        row.reserved_embedding_input_chars = Math.max(0, row.reserved_embedding_input_chars - amount);
+        row.embedding_input_chars += consumed;
+      }
+      return [];
+    }
+    if (query.startsWith('update usage_counters set reserved_mcp_calls = max(0, reserved_mcp_calls - ?)')) {
+      const [amount, tenantId, day] = this.values as [number, string, string];
+      const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
+      if (row) row.reserved_mcp_calls = Math.max(0, row.reserved_mcp_calls - amount);
+      return [];
+    }
+    if (query.startsWith('update usage_counters set reserved_memory_writes = max(0, reserved_memory_writes - ?)')) {
+      const [amount, tenantId, day] = this.values as [number, string, string];
+      const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
+      if (row) row.reserved_memory_writes = Math.max(0, row.reserved_memory_writes - amount);
+      return [];
+    }
+    if (query.startsWith('update usage_counters set reserved_vector_queries = max(0, reserved_vector_queries - ?)')) {
+      const [amount, tenantId, day] = this.values as [number, string, string];
+      const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
+      if (row) row.reserved_vector_queries = Math.max(0, row.reserved_vector_queries - amount);
+      return [];
+    }
+    if (query.startsWith('update usage_counters set reserved_embedding_input_chars = max(0, reserved_embedding_input_chars - ?)')) {
+      const [amount, tenantId, day] = this.values as [number, string, string];
+      const row = this.store.usage_counters.find((item) => item.tenant_id === tenantId && item.day === day);
+      if (row) row.reserved_embedding_input_chars = Math.max(0, row.reserved_embedding_input_chars - amount);
       return [];
     }
     if (query.startsWith('insert into write_audit_log')) {
       const [id, tenantId, operation, params, result, createdAt] = this.values as [string, string, string, string, string | null, string];
       this.store.write_audit_log.push({ id, tenant_id: tenantId, operation, redacted_params_json: params, result_json: result, created_at: createdAt });
+      return [];
+    }
+    if (query.startsWith('insert into oauth_authorization_codes')) {
+      const [jti, clientId, expiresAt, consumedAt] = this.values as [string, string, number, number];
+      if (this.store.oauth_authorization_codes.find((row) => row.jti === jti)) {
+        throw Object.assign(new Error('duplicate auth code'), { meta: { changes: 0 } });
+      }
+      this.store.oauth_authorization_codes.push({ jti, client_id: clientId, expires_at: expiresAt, consumed_at: consumedAt });
+      return [];
+    }
+    if (query.startsWith('insert into oauth_refresh_sessions')) {
+      const [sessionId, tenantId, clientId, subject, expiresAt] = this.values as [string, string, string, string, number];
+      this.store.oauth_refresh_sessions.push({ session_id: sessionId, tenant_id: tenantId, client_id: clientId, subject, expires_at: expiresAt, revoked_at: null });
+      return [];
+    }
+    if (query.startsWith('select session_id, revoked_at from oauth_refresh_sessions where session_id = ?')) {
+      const [sessionId] = this.values as [string];
+      return this.store.oauth_refresh_sessions.filter((row) => row.session_id === sessionId) as T[];
+    }
+    if (query.startsWith('update oauth_refresh_sessions set revoked_at = coalesce(revoked_at, ?)')) {
+      const [revokedAt, sessionId] = this.values as [number, string];
+      const row = this.store.oauth_refresh_sessions.find((item) => item.session_id === sessionId);
+      if (row && row.revoked_at === null) {
+        row.revoked_at = revokedAt;
+      }
+      return [];
+    }
+    if (query.startsWith('insert into oauth_refresh_tokens')) {
+      const [jti, sessionId, clientId, parentJti, expiresAt] = this.values as [string, string, string, string | null, number];
+      this.store.oauth_refresh_tokens.push({ jti, session_id: sessionId, client_id: clientId, parent_jti: parentJti, expires_at: expiresAt, consumed_at: null, replaced_by_jti: null });
+      return [];
+    }
+    if (query.startsWith('update oauth_refresh_tokens set consumed_at = ?, replaced_by_jti = ?')) {
+      const [consumedAt, nextJti, presentedJti, sessionId, clientId] = this.values as [number, string, string, string, string];
+      const row = this.store.oauth_refresh_tokens.find((item) => item.jti === presentedJti && item.session_id === sessionId && item.client_id === clientId && item.consumed_at === null);
+      if (!row) {
+        throw Object.assign(new Error('refresh already consumed'), { meta: { changes: 0 } });
+      }
+      row.consumed_at = consumedAt;
+      row.replaced_by_jti = nextJti;
       return [];
     }
     if (query.startsWith('select count(*) as count, max(created_at) as latest from write_audit_log')) {
@@ -458,6 +693,10 @@ export class FakeD1Database implements D1DatabaseLike {
     tunnels: [],
     usage_counters: [],
     write_audit_log: [],
+    oauth_authorization_codes: [],
+    oauth_refresh_sessions: [],
+    oauth_refresh_tokens: [],
+    auth_rate_limits: [],
   };
 
   prepare(query: string): PreparedStatementLike {
@@ -594,10 +833,10 @@ export function createBaseEnv(overrides: Partial<AppEnv> = {}): AppEnv {
     DRAWER_MAX_CHARS: '64000',
     DRAWER_DEFAULT_MAX_CHARS: '16000',
     SEARCH_RESULT_MAX_CHARS: '4000',
-    DAILY_MAX_MCP_CALLS_PER_TENANT: '2000',
-    DAILY_MAX_WRITES_PER_TENANT: '100',
-    DAILY_MAX_VECTOR_QUERIES_PER_TENANT: '500',
-    DAILY_MAX_EMBEDDING_INPUT_CHARS_PER_TENANT: '500000',
+    DAILY_MAX_MCP_CALLS_PER_TENANT: '50000',
+    DAILY_MAX_WRITES_PER_TENANT: '10000',
+    DAILY_MAX_VECTOR_QUERIES_PER_TENANT: '3255',
+    DAILY_MAX_EMBEDDING_INPUT_CHARS_PER_TENANT: '20000000',
     JWT_SIGNING_SECRET: 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY',
     TOKEN_ENCRYPTION_KEY: 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY',
     AUTH_KEY_PEPPER: 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY',

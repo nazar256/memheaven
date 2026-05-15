@@ -1,7 +1,7 @@
 import type { AppConfig, AppEnv } from '../config';
 import type { DiaryEntryRecord, TenantAuthContext } from './types';
 import { writeAuditLog } from './audit';
-import { ensureQuotaAvailable, incrementUsage } from './quotas';
+import { consumeQuotaReservation, incrementUsage, releaseQuotaReservation, reserveQuota } from './quotas';
 import { queryAll, queryFirst, execute } from '../storage/d1';
 import { getText, putText } from '../storage/r2';
 import { requireBinding } from './index';
@@ -29,7 +29,7 @@ function diaryKey(tenantId: string, agentName: string, entryId: string): string 
 export async function diaryWrite(env: AppEnv, config: AppConfig, auth: TenantAuthContext, input: DiaryWriteInput) {
   const db = requireBinding(env.DB, 'DB');
   const bucket = requireBinding(env.MEMORY_BUCKET, 'MEMORY_BUCKET');
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'memory_writes', 1);
+  const reservationDay = await reserveQuota(db, config, auth.tenantId, 'memory_writes', 1);
 
   const agentName = sanitizeSimpleText(input.agent_name.toLowerCase(), 'agent_name');
   const topic = sanitizeSimpleText(input.topic ?? 'session', 'topic', 120);
@@ -41,24 +41,30 @@ export async function diaryWrite(env: AppEnv, config: AppConfig, auth: TenantAut
   const createdAt = nowIso();
   const entryId = await deterministicId('diary', [auth.tenantId, agentName, topic, createdAt]);
   const r2Key = diaryKey(auth.tenantId, agentName, entryId);
-  await putText(bucket, r2Key, entry);
-  const contentHash = await sha256Hex(entry);
-  await execute(
-    db,
-    `insert into diary_entries(id, tenant_id, agent_name, topic, r2_key, content_hash, created_at)
-     values (?, ?, ?, ?, ?, ?, ?)`,
-    [entryId, auth.tenantId, agentName, topic, r2Key, contentHash, createdAt],
-  );
-  await incrementUsage(db, auth.tenantId, { memory_writes: 1, r2_writes: 1 });
-  await writeAuditLog(db, auth.tenantId, 'diary_write', { agent_name: agentName, topic, entry }, { success: true, entry_id: entryId });
-  return {
-    success: true,
-    entry_id: entryId,
-    agent: agentName,
-    topic,
-    timestamp: createdAt,
-    wing: input.wing ?? `wing_${agentName}`,
-  };
+  try {
+    await putText(bucket, r2Key, entry);
+    const contentHash = await sha256Hex(entry);
+    await execute(
+      db,
+      `insert into diary_entries(id, tenant_id, agent_name, topic, r2_key, content_hash, created_at)
+       values (?, ?, ?, ?, ?, ?, ?)`,
+      [entryId, auth.tenantId, agentName, topic, r2Key, contentHash, createdAt],
+    );
+    await consumeQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    await incrementUsage(db, auth.tenantId, { r2_writes: 1 });
+    await writeAuditLog(db, auth.tenantId, 'diary_write', { agent_name: agentName, topic, entry }, { success: true, entry_id: entryId });
+    return {
+      success: true,
+      entry_id: entryId,
+      agent: agentName,
+      topic,
+      timestamp: createdAt,
+      wing: input.wing ?? `wing_${agentName}`,
+    };
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    throw error;
+  }
 }
 
 export async function diaryRead(env: AppEnv, _config: AppConfig, auth: TenantAuthContext, input: DiaryReadInput) {

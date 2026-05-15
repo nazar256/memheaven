@@ -63,7 +63,8 @@ npx wrangler secret put JWT_SIGNING_SECRET
 npx wrangler secret put TOKEN_ENCRYPTION_KEY
 npx wrangler secret put AUTH_KEY_PEPPER
 
-AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>' npm run keygen -- --tenant personal --label "Personal"
+export AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>'
+npm run keygen -- --tenant personal --label "Personal"
 
 npx wrangler deploy
 ```
@@ -154,7 +155,7 @@ We see that as complementary to MemPalace’s on-device approach, not a replacem
 - Preserves tool names, wings/rooms/drawers model, Memory Protocol, diary, KG, and tunnel concepts where practical.
 - Does **not** preserve Python runtime, ChromaDB internals, filesystem sync, or local desktop hook behavior.
 - Stores verbatim drawer and diary bodies in R2; D1 and Vectorize are indexes/metadata, not source of truth.
-- Uses stateless JWT authorization codes, access tokens, and refresh tokens instead of server-side OAuth sessions.
+- Uses short-lived JWT authorization codes plus access and refresh tokens with durable replay protection instead of server-side OAuth sessions.
 
 ## Public routes
 
@@ -233,7 +234,8 @@ This is the fastest happy path for self-hosting MemHeaven.
 6. Generate your first access key and sync `ACCESS_KEYS_JSON`:
 
    ```bash
-   AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>' npm run keygen -- --tenant personal --label "Personal"
+   export AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>'
+   npm run keygen -- --tenant personal --label "Personal"
    ```
 
 7. Validate locally, then deploy:
@@ -299,7 +301,8 @@ npx wrangler secret put AUTH_KEY_PEPPER
 Generate an access key and automatically maintain the local git-ignored key store plus the Cloudflare `ACCESS_KEYS_JSON` secret:
 
 ```bash
-AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>' npm run keygen -- --tenant personal --label "Personal"
+export AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>'
+npm run keygen -- --tenant personal --label "Personal"
 ```
 
 By default this command:
@@ -311,13 +314,15 @@ By default this command:
 If you only want to update the local git-ignored file without touching Cloudflare yet:
 
 ```bash
-AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>' npm run keygen -- --tenant personal --label "Personal" --no-sync
+export AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>'
+npm run keygen -- --tenant personal --label "Personal" --no-sync
 ```
 
 If you want a custom local file, it must stay under `.tmp/`:
 
 ```bash
-AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>' npm run keygen -- --tenant personal --label "Personal" --file .tmp/my-access-keys.json --no-sync
+export AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>'
+npm run keygen -- --tenant personal --label "Personal" --file .tmp/my-access-keys.json --no-sync
 ```
 
 The local file stores only hashed records, never raw keys. Save the printed raw key somewhere safe immediately because it is not written to disk.
@@ -353,7 +358,8 @@ npx wrangler d1 migrations apply memheaven_memory --remote
 Add another tenant:
 
 ```bash
-AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>' npm run keygen -- --tenant family-member --label "Family member"
+export AUTH_KEY_PEPPER='<same AUTH_KEY_PEPPER value>'
+npm run keygen -- --tenant family-member --label "Family member"
 npx wrangler deploy
 ```
 
@@ -417,14 +423,15 @@ npm run smoke:oauth -- --base https://your-domain.example
 Authenticated MCP smoke:
 
 ```bash
-npm run smoke:mcp -- --base https://your-domain.example --token <bearer-token>
+export MEMHEAVEN_BEARER_TOKEN='<bearer-token>'
+npm run smoke:mcp -- --base https://your-domain.example
 ```
 
 Vector metadata reindex helper:
 
 ```bash
-npm run reindex -- --base https://your-domain.example --token <bearer-token> --dry-run
-npm run reindex -- --base https://your-domain.example --token <bearer-token>
+npm run reindex -- --base https://your-domain.example --dry-run
+npm run reindex -- --base https://your-domain.example
 ```
 
 Use the reindex helper if you created Vectorize metadata indexes after data had already been embedded and inserted.
@@ -457,8 +464,8 @@ The service does not trust client-supplied tenant information; isolation comes f
 
 - No ChromaDB or local SQLite compatibility.
 - No local filesystem sync; `mempalace_sync` is intentionally unsupported in hosted mode.
-- Stateless OAuth means authorization codes are short-lived but not strictly one-time-use without durable server state.
-- Refresh tokens are revoked by access-key removal, not individual refresh-token storage.
+- Authorization codes are short-lived and single-use.
+- Refresh tokens rotate with replay detection. Removing or deactivating the backing access key still invalidates future token checks for that key.
 - Embeddings use `@cf/baai/bge-small-en-v1.5`, so long drawer bodies are chunked before indexing.
 - Vectorize dimensions are locked to the configured index (`384` for the default MVP setup).
 - Hosted-client callback support stays narrow and contract-driven. Other clients may need explicit callback allowlist additions before they work end-to-end.

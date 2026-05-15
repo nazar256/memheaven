@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { requireConfig } from '../src/config';
 import { findAccessKeyRecord, hashAccessKey } from '../src/security/accessKeys';
-import { redactHeaders, redactObject } from '../src/security/redact';
+import { redactErrorMessage, redactHeaders, redactObject } from '../src/security/redact';
 import { createEnvWithKeys, RAW_KEY_A } from './helpers/testData';
 
 describe('access keys and redaction', async () => {
@@ -24,5 +24,7 @@ describe('access keys and redaction', async () => {
     const redactedHeaders = redactHeaders(headers);
     expect(redactedHeaders.authorization).toBe('[REDACTED]');
     expect(redactedHeaders['x-test']).toBe('ok');
+
+    expect(redactErrorMessage('refresh_token=abc code=xyz Bearer secret.jwt.token')).toContain('[REDACTED]');
   });
 });

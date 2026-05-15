@@ -101,10 +101,14 @@ export interface UsageCounterRecord {
   tenant_id: string;
   day: string;
   mcp_calls: number;
+  reserved_mcp_calls: number;
   memory_reads: number;
   memory_writes: number;
+  reserved_memory_writes: number;
   vector_queries: number;
+  reserved_vector_queries: number;
   embedding_input_chars: number;
+  reserved_embedding_input_chars: number;
   r2_reads: number;
   r2_writes: number;
 }

@@ -4,6 +4,7 @@ import { handleHealth } from './http/health';
 import { handleAuthorizeGet, handleAuthorizePost } from './oauth/authorize';
 import { buildAuthorizationServerMetadata, buildProtectedResourceMetadata, jsonResponse } from './oauth/metadata';
 import { handleRegister } from './oauth/register';
+import { OAuthRateLimitError, enforceAuthFlowRateLimit } from './oauth/state';
 import { handleToken } from './oauth/token';
 import { handleMcpRequest } from './mcp/transport';
 
@@ -36,6 +37,54 @@ function serviceInfo(env: AppEnv): Response {
     warnings: diagnostics.warnings,
     errors: diagnostics.errors,
   });
+}
+
+function clientIpFromRequest(request: Request): string {
+  const cfConnectingIp = request.headers.get('cf-connecting-ip')?.trim();
+  if (cfConnectingIp) {
+    return cfConnectingIp;
+  }
+  const xForwardedFor = request.headers.get('x-forwarded-for');
+  if (xForwardedFor) {
+    return xForwardedFor.split(',')[0]?.trim() || 'unknown';
+  }
+  return 'unknown';
+}
+
+function rateLimitedJsonResponse(retryAfterSeconds: number): Response {
+  return jsonResponse(
+    { error: 'temporarily_unavailable', error_description: 'Too many authentication attempts; try again shortly' },
+    429,
+    { 'retry-after': String(retryAfterSeconds) },
+  );
+}
+
+function rateLimitedHtmlResponse(retryAfterSeconds: number): Response {
+  return new Response('<h1>Try again shortly</h1><p>Too many authentication attempts. Please wait a minute and try again.</p>', {
+    status: 429,
+    headers: {
+      'content-type': 'text/html; charset=utf-8',
+      'cache-control': 'no-store',
+      'retry-after': String(retryAfterSeconds),
+      'referrer-policy': 'no-referrer',
+      'x-content-type-options': 'nosniff',
+    },
+  });
+}
+
+async function enforcePublicAuthRateLimit(request: Request, env: AppEnv, scope: 'register' | 'authorize_post' | 'token') {
+  const diagnostics = getConfigDiagnostics(env);
+  if (!diagnostics.config || !env.DB) {
+    return;
+  }
+  const clientIp = clientIpFromRequest(request);
+  await enforceAuthFlowRateLimit(
+    env.DB,
+    scope,
+    clientIp,
+    diagnostics.config.authFlowRateLimitPerMinute,
+    diagnostics.config.authFlowRateLimitWindowSeconds,
+  );
 }
 
 const handler = {
@@ -84,6 +133,14 @@ const handler = {
       if (!diagnostics.config) {
         return jsonResponse({ error: 'server_misconfigured', errors: diagnostics.errors, warnings: diagnostics.warnings }, 503);
       }
+      try {
+        await enforcePublicAuthRateLimit(request, env, 'register');
+      } catch (error) {
+        if (error instanceof OAuthRateLimitError) {
+          return rateLimitedJsonResponse(error.retryAfterSeconds);
+        }
+        throw error;
+      }
       return handleRegister(request, diagnostics.config);
     }
 
@@ -95,6 +152,14 @@ const handler = {
         return handleAuthorizeGet(request, diagnostics.config);
       }
       if (request.method === 'POST') {
+        try {
+          await enforcePublicAuthRateLimit(request, env, 'authorize_post');
+        } catch (error) {
+          if (error instanceof OAuthRateLimitError) {
+            return rateLimitedHtmlResponse(error.retryAfterSeconds);
+          }
+          throw error;
+        }
         return handleAuthorizePost(request, diagnostics.config);
       }
       return methodNotAllowed('GET, POST');
@@ -107,7 +172,15 @@ const handler = {
       if (!diagnostics.config) {
         return jsonResponse({ error: 'server_misconfigured', errors: diagnostics.errors, warnings: diagnostics.warnings }, 503);
       }
-      return handleToken(request, diagnostics.config);
+      try {
+        await enforcePublicAuthRateLimit(request, env, 'token');
+      } catch (error) {
+        if (error instanceof OAuthRateLimitError) {
+          return rateLimitedJsonResponse(error.retryAfterSeconds);
+        }
+        throw error;
+      }
+      return handleToken(request, diagnostics.config, env.DB!);
     }
 
     if (url.pathname === '/mcp') {

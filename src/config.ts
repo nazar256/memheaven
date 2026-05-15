@@ -142,6 +142,8 @@ export interface AppConfig {
   authCodeTtlSeconds: number;
   accessTokenTtlSeconds: number;
   refreshTokenMaxDays: number;
+  authFlowRateLimitPerMinute: number;
+  authFlowRateLimitWindowSeconds: number;
   csrfCookieName: string;
   supportedScopes: string[];
   backendCapabilities: BackendCapabilities;
@@ -287,6 +289,8 @@ export function getConfigDiagnostics(env: AppEnv): ConfigDiagnostics {
       authCodeTtlSeconds: 180,
       accessTokenTtlSeconds: 3600,
       refreshTokenMaxDays: 365,
+      authFlowRateLimitPerMinute: 3,
+      authFlowRateLimitWindowSeconds: 60,
       csrfCookieName: 'memheaven_csrf',
       supportedScopes: ['memory.read', 'memory.write'],
       backendCapabilities: {

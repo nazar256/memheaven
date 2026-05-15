@@ -46,9 +46,9 @@ async function main() {
   });
 
   const base = values.base?.replace(/\/$/u, '');
-  const token = values.token;
+  const token = values.token ?? process.env.MEMHEAVEN_BEARER_TOKEN;
   if (!base || !token) {
-    throw new Error('Usage: npm run reindex -- --base https://your-domain.example --token <bearer> [--drawer <id>] [--wing <wing>] [--room <room>] [--limit <1-100>] [--dry-run]');
+    throw new Error('Usage: MEMHEAVEN_BEARER_TOKEN=<bearer> npm run reindex -- --base https://your-domain.example [--drawer <id>] [--wing <wing>] [--room <room>] [--limit <1-100>] [--dry-run] (or pass --token)');
   }
 
   const pageLimit = clampLimit(values.limit);

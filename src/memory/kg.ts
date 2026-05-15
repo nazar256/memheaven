@@ -1,7 +1,7 @@
 import type { AppConfig, AppEnv } from '../config';
 import type { KgEntityRecord, KgTripleRecord, TenantAuthContext } from './types';
 import { writeAuditLog } from './audit';
-import { ensureQuotaAvailable, incrementUsage } from './quotas';
+import { consumeQuotaReservation, incrementUsage, releaseQuotaReservation, reserveQuota } from './quotas';
 import { queryAll, queryFirst, execute } from '../storage/d1';
 import { requireBinding } from './index';
 import { deterministicId } from '../utils/ids';
@@ -65,48 +65,70 @@ async function upsertEntity(env: AppEnv, auth: TenantAuthContext, name: string) 
   return id;
 }
 
+async function requireOwnedDrawerId(env: AppEnv, tenantId: string, drawerId: string | undefined): Promise<string | null> {
+  if (!drawerId) {
+    return null;
+  }
+  const db = requireBinding(env.DB, 'DB');
+  const drawer = await queryFirst<{ id: string }>(
+    db,
+    `select id from drawers where tenant_id = ? and id = ? and deleted_at is null`,
+    [tenantId, drawerId],
+  );
+  if (!drawer) {
+    throw new Error('source_drawer_id must reference an existing drawer for this tenant');
+  }
+  return drawerId;
+}
+
 export async function kgAdd(env: AppEnv, config: AppConfig, auth: TenantAuthContext, input: KgAddInput) {
   const db = requireBinding(env.DB, 'DB');
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'memory_writes', 1);
+  const reservationDay = await reserveQuota(db, config, auth.tenantId, 'memory_writes', 1);
   const subject = sanitizeSimpleText(input.subject, 'subject', 200);
   const predicate = sanitizeSimpleText(input.predicate, 'predicate', 120);
   const object = sanitizeSimpleText(input.object, 'object', 200);
   const validFrom = input.valid_from ? asIsoDate(input.valid_from) : null;
   const validTo = input.valid_to ? asIsoDate(input.valid_to) : null;
-  if (validFrom && validTo && validFrom > validTo) {
-    throw new Error('valid_to must not be earlier than valid_from');
-  }
-  await upsertEntity(env, auth, subject);
-  await upsertEntity(env, auth, object);
+  try {
+    if (validFrom && validTo && validFrom > validTo) {
+      throw new Error('valid_to must not be earlier than valid_from');
+    }
+    const sourceDrawerId = await requireOwnedDrawerId(env, auth.tenantId, input.source_drawer_id);
+    await upsertEntity(env, auth, subject);
+    await upsertEntity(env, auth, object);
 
-  const createdAt = nowIso();
-  const tripleId = await deterministicId('kgtriple', [auth.tenantId, subject, predicate, object, validFrom, createdAt]);
-  await execute(
-    db,
-    `insert into kg_triples(id, tenant_id, subject, predicate, object, valid_from, valid_to, confidence, source_drawer_id, source_closet, created_at, updated_at)
-     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      tripleId,
-      auth.tenantId,
-      subject,
-      predicate,
-      object,
-      validFrom,
-      validTo,
-      input.confidence ?? null,
-      input.source_drawer_id ?? null,
-      input.source_closet ?? input.source_file ?? null,
-      createdAt,
-      createdAt,
-    ],
-  );
-  await incrementUsage(db, auth.tenantId, { memory_writes: 1 });
-  await writeAuditLog(db, auth.tenantId, 'kg_add', input, { success: true, triple_id: tripleId });
-  return {
-    success: true,
-    triple_id: tripleId,
-    fact: { subject, predicate, object, valid_from: validFrom, valid_to: validTo, confidence: input.confidence ?? null },
-  };
+    const createdAt = nowIso();
+    const tripleId = await deterministicId('kgtriple', [auth.tenantId, subject, predicate, object, validFrom, createdAt]);
+    await execute(
+      db,
+      `insert into kg_triples(id, tenant_id, subject, predicate, object, valid_from, valid_to, confidence, source_drawer_id, source_closet, created_at, updated_at)
+       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        tripleId,
+        auth.tenantId,
+        subject,
+        predicate,
+        object,
+        validFrom,
+        validTo,
+        input.confidence ?? null,
+        sourceDrawerId,
+        input.source_closet ?? input.source_file ?? null,
+        createdAt,
+        createdAt,
+      ],
+    );
+    await consumeQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    await writeAuditLog(db, auth.tenantId, 'kg_add', input, { success: true, triple_id: tripleId });
+    return {
+      success: true,
+      triple_id: tripleId,
+      fact: { subject, predicate, object, valid_from: validFrom, valid_to: validTo, confidence: input.confidence ?? null },
+    };
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    throw error;
+  }
 }
 
 function currentFactWhere(asOf?: string): { clause: string; values: unknown[] } {
@@ -164,21 +186,26 @@ export async function kgQuery(env: AppEnv, auth: TenantAuthContext, input: KgQue
 
 export async function kgInvalidate(env: AppEnv, config: AppConfig, auth: TenantAuthContext, input: KgInvalidateInput) {
   const db = requireBinding(env.DB, 'DB');
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'memory_writes', 1);
+  const reservationDay = await reserveQuota(db, config, auth.tenantId, 'memory_writes', 1);
   const subject = sanitizeSimpleText(input.subject, 'subject', 200);
   const predicate = sanitizeSimpleText(input.predicate, 'predicate', 120);
   const object = sanitizeSimpleText(input.object, 'object', 200);
   const ended = input.ended ? asIsoDate(input.ended) : nowIso();
-  await execute(
-    db,
-    `update kg_triples
-     set valid_to = ?, updated_at = ?
-      where tenant_id = ? and subject = ? and predicate = ? and object = ? and (valid_to is null or valid_to > ?)`,
-    [ended, nowIso(), auth.tenantId, subject, predicate, object, ended],
-  );
-  await incrementUsage(db, auth.tenantId, { memory_writes: 1 });
-  await writeAuditLog(db, auth.tenantId, 'kg_invalidate', input, { success: true, ended });
-  return { success: true, fact: { subject, predicate, object }, ended };
+  try {
+    await execute(
+      db,
+      `update kg_triples
+       set valid_to = ?, updated_at = ?
+        where tenant_id = ? and subject = ? and predicate = ? and object = ? and (valid_to is null or valid_to > ?)`,
+      [ended, nowIso(), auth.tenantId, subject, predicate, object, ended],
+    );
+    await consumeQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    await writeAuditLog(db, auth.tenantId, 'kg_invalidate', input, { success: true, ended });
+    return { success: true, fact: { subject, predicate, object }, ended };
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    throw error;
+  }
 }
 
 export async function kgTimeline(env: AppEnv, auth: TenantAuthContext, input: KgTimelineInput) {

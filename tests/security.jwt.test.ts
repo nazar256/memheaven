@@ -49,7 +49,7 @@ async function issueAccessToken(env: Awaited<ReturnType<typeof createEnvWithKeys
       client_id: clientId,
       redirect_uri: redirectUri,
     }),
-  }), config);
+  }), config, env.DB!);
 
   return {
     config,

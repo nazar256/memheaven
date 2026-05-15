@@ -9,9 +9,9 @@ async function main() {
   });
 
   const base = values.base?.replace(/\/$/u, '');
-  const token = values.token;
+  const token = values.token ?? process.env.MEMHEAVEN_BEARER_TOKEN;
   if (!base || !token) {
-    throw new Error('Usage: npm run smoke:mcp -- --base https://your-domain.example --token <bearer-token>');
+    throw new Error('Usage: MEMHEAVEN_BEARER_TOKEN=<bearer-token> npm run smoke:mcp -- --base https://your-domain.example (or pass --token)');
   }
 
   const response = await fetch(`${base}/mcp`, {

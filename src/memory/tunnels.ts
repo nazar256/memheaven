@@ -1,7 +1,7 @@
 import type { AppEnv, AppConfig } from '../config';
 import type { TunnelRecord, TenantAuthContext } from './types';
 import { writeAuditLog } from './audit';
-import { ensureQuotaAvailable, incrementUsage } from './quotas';
+import { consumeQuotaReservation, releaseQuotaReservation, reserveQuota } from './quotas';
 import { getText } from '../storage/r2';
 import { queryAll, queryFirst, execute } from '../storage/d1';
 import { requireBinding } from './index';
@@ -74,7 +74,7 @@ async function requireOwnedDrawerId(env: AppEnv, tenantId: string, drawerId: str
 
 export async function createTunnel(env: AppEnv, config: AppConfig, auth: TenantAuthContext, input: CreateTunnelInput) {
   const db = requireBinding(env.DB, 'DB');
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'memory_writes', 1);
+  const reservationDay = await reserveQuota(db, config, auth.tenantId, 'memory_writes', 1);
   const sourceWing = sanitizeSimpleText(input.source_wing, 'source_wing');
   const sourceRoom = sanitizeSimpleText(input.source_room, 'source_room');
   const targetWing = sanitizeSimpleText(input.target_wing, 'target_wing');
@@ -84,23 +84,28 @@ export async function createTunnel(env: AppEnv, config: AppConfig, auth: TenantA
   const targetDrawerId = await requireOwnedDrawerId(env, auth.tenantId, input.target_drawer_id, 'target_drawer_id');
   const createdAt = nowIso();
   const id = await deterministicId('tunnel', [auth.tenantId, sourceWing, sourceRoom, targetWing, targetRoom, label ?? '', sourceDrawerId ?? '', targetDrawerId ?? '']);
-  await execute(
-    db,
-    `insert into tunnels(id, tenant_id, source_wing, source_room, target_wing, target_room, label, source_drawer_id, target_drawer_id, created_at)
-     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     on conflict(id) do nothing`,
-    [id, auth.tenantId, sourceWing, sourceRoom, targetWing, targetRoom, label, sourceDrawerId, targetDrawerId, createdAt],
-  );
-  await incrementUsage(db, auth.tenantId, { memory_writes: 1 });
-  await writeAuditLog(db, auth.tenantId, 'create_tunnel', input, { success: true, tunnel_id: id });
-  return {
-    success: true,
-    tunnel_id: id,
-    source: { wing: sourceWing, room: sourceRoom },
-    target: { wing: targetWing, room: targetRoom },
-    label,
-    id,
-  };
+  try {
+    await execute(
+      db,
+      `insert into tunnels(id, tenant_id, source_wing, source_room, target_wing, target_room, label, source_drawer_id, target_drawer_id, created_at)
+       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       on conflict(id) do nothing`,
+      [id, auth.tenantId, sourceWing, sourceRoom, targetWing, targetRoom, label, sourceDrawerId, targetDrawerId, createdAt],
+    );
+    await consumeQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    await writeAuditLog(db, auth.tenantId, 'create_tunnel', input, { success: true, tunnel_id: id });
+    return {
+      success: true,
+      tunnel_id: id,
+      source: { wing: sourceWing, room: sourceRoom },
+      target: { wing: targetWing, room: targetRoom },
+      label,
+      id,
+    };
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    throw error;
+  }
 }
 
 export async function listTunnels(env: AppEnv, auth: TenantAuthContext, input: ListTunnelsInput) {
@@ -125,11 +130,16 @@ export async function listTunnels(env: AppEnv, auth: TenantAuthContext, input: L
 
 export async function deleteTunnel(env: AppEnv, config: AppConfig, auth: TenantAuthContext, tunnelId: string) {
   const db = requireBinding(env.DB, 'DB');
-  await ensureQuotaAvailable(db, config, auth.tenantId, 'memory_writes', 1);
-  await execute(db, `delete from tunnels where tenant_id = ? and id = ?`, [auth.tenantId, tunnelId]);
-  await incrementUsage(db, auth.tenantId, { memory_writes: 1 });
-  await writeAuditLog(db, auth.tenantId, 'delete_tunnel', { tunnel_id: tunnelId }, { success: true });
-  return { success: true, tunnel_id: tunnelId, deleted: tunnelId };
+  const reservationDay = await reserveQuota(db, config, auth.tenantId, 'memory_writes', 1);
+  try {
+    await execute(db, `delete from tunnels where tenant_id = ? and id = ?`, [auth.tenantId, tunnelId]);
+    await consumeQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    await writeAuditLog(db, auth.tenantId, 'delete_tunnel', { tunnel_id: tunnelId }, { success: true });
+    return { success: true, tunnel_id: tunnelId, deleted: tunnelId };
+  } catch (error) {
+    await releaseQuotaReservation(db, auth.tenantId, 'memory_writes', 1, reservationDay);
+    throw error;
+  }
 }
 
 export async function followTunnels(env: AppEnv, auth: TenantAuthContext, input: FollowTunnelsInput) {

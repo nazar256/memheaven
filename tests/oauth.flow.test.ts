@@ -61,6 +61,20 @@ describe('oauth flow', async () => {
     }
   });
 
+  it('returns a safe 503 when token endpoint has no DB binding', async () => {
+    const env = await createEnvWithKeys();
+    const config = requireConfig(env);
+    const response = await handleToken(new Request('https://memory.example.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: 'x', client_id: 'y' }),
+    }), config, undefined as never);
+
+    expect(response.status).toBe(503);
+    const body = await response.json() as { error: string };
+    expect(body.error).toBe('server_error');
+  });
+
   it('rejects removed keys during refresh token exchange', async () => {
     const env = await createEnvWithKeys();
     const config = requireConfig(env);
@@ -96,7 +110,7 @@ describe('oauth flow', async () => {
         client_id: clientId,
         redirect_uri: redirectUri,
       }),
-    }), config);
+    }), config, env.DB!);
     const tokenBody = await tokenResponse.json() as { refresh_token: string };
 
     env.ACCESS_KEYS_JSON = JSON.stringify([
@@ -119,11 +133,11 @@ describe('oauth flow', async () => {
         refresh_token: tokenBody.refresh_token,
         client_id: clientId,
       }),
-    }), requireConfig(env));
+    }), requireConfig(env), env.DB!);
 
     expect(removedKeyRefresh.status).toBe(400);
     const removedKeyBody = await removedKeyRefresh.json() as { error_description: string };
-    expect(removedKeyBody.error_description).toContain('Access key is inactive');
+    expect(removedKeyBody.error_description).toBe('The provided grant is invalid or expired');
   });
 
   it('narrows refreshed token scopes to the currently active key scopes', async () => {
@@ -161,7 +175,7 @@ describe('oauth flow', async () => {
         client_id: clientId,
         redirect_uri: redirectUri,
       }),
-    }), config);
+    }), config, env.DB!);
     const tokenBody = await tokenResponse.json() as { refresh_token: string };
 
     env.ACCESS_KEYS_JSON = JSON.stringify([
@@ -184,14 +198,25 @@ describe('oauth flow', async () => {
         refresh_token: tokenBody.refresh_token,
         client_id: clientId,
       }),
-    }), requireConfig(env));
+    }), requireConfig(env), env.DB!);
 
     expect(refreshed.status).toBe(200);
-    const refreshedBody = await refreshed.json() as { access_token: string; scope: string };
+    const refreshedBody = await refreshed.json() as { access_token: string; refresh_token: string; scope: string };
     expect(refreshedBody.scope).toBe('memory.read');
     const claims = await verifyAccessToken(requireConfig(env), refreshedBody.access_token);
     expect(claims.scopes).toEqual(['memory.read']);
     expect(claims.keyLabel).toBe('Tenant A narrowed');
+
+    const secondRefresh = await handleToken(new Request('https://memory.example.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshedBody.refresh_token,
+        client_id: clientId,
+      }),
+    }), requireConfig(env), env.DB!);
+    expect(secondRefresh.status).toBe(200);
   });
 
   it('omits Secure on authorize CSRF cookie for local http issuer', async () => {
@@ -254,7 +279,7 @@ describe('oauth flow', async () => {
         client_id: clientId,
         redirect_uri: redirectUri,
       }),
-    }), config);
+    }), config, env.DB!);
     expect(tokenResponse.status).toBe(200);
     const tokenBody = await tokenResponse.json() as { access_token: string; refresh_token: string };
     const claims = await verifyAccessToken(config, tokenBody.access_token);
@@ -268,7 +293,7 @@ describe('oauth flow', async () => {
         refresh_token: tokenBody.refresh_token,
         client_id: clientId,
       }),
-    }), config);
+    }), config, env.DB!);
     expect(refreshed.status).toBe(200);
     const refreshedBody = await refreshed.json() as { access_token: string };
     const refreshedClaims = await verifyAccessToken(config, refreshedBody.access_token);
@@ -284,8 +309,87 @@ describe('oauth flow', async () => {
         client_id: clientId,
         redirect_uri: redirectUri,
       }),
-    }), config);
+    }), config, env.DB!);
     expect(invalidPkce.status).toBe(400);
+    const invalidPkceBody = await invalidPkce.json() as { error_description: string };
+    expect(invalidPkceBody.error_description).toBe('The provided grant is invalid or expired');
+  });
+
+  it('rejects authorization code replay and refresh token replay with generic errors', async () => {
+    const env = await createEnvWithKeys();
+    const config = requireConfig(env);
+    const clientId = await deriveClientId(config.issuer, redirectUri);
+    const { csrf } = await issueAuthorizePage(config, clientId);
+
+    const authPost = await handleAuthorizePost(new Request('https://memory.example.com/authorize', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        cookie: `${config.csrfCookieName}=${csrf}`,
+      },
+      body: new URLSearchParams({
+        response_type: 'code',
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        code_challenge: validChallenge,
+        code_challenge_method: 'S256',
+        csrf_token: csrf!,
+        access_key: RAW_KEY_A,
+        duration_days: '30',
+      }),
+    }), config);
+
+    const code = new URL(authPost.headers.get('location')!).searchParams.get('code');
+    const tokenResponse = await handleToken(new Request('https://memory.example.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code!,
+        code_verifier: validVerifier,
+        client_id: clientId,
+        redirect_uri: redirectUri,
+      }),
+    }), config, env.DB!);
+    expect(tokenResponse.status).toBe(200);
+    const tokenBody = await tokenResponse.json() as { refresh_token: string };
+
+    const replayedCode = await handleToken(new Request('https://memory.example.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code!,
+        code_verifier: validVerifier,
+        client_id: clientId,
+        redirect_uri: redirectUri,
+      }),
+    }), config, env.DB!);
+    expect(replayedCode.status).toBe(400);
+    expect((await replayedCode.json() as { error_description: string }).error_description).toBe('Authorization code is invalid or expired');
+
+    const firstRefresh = await handleToken(new Request('https://memory.example.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: tokenBody.refresh_token,
+        client_id: clientId,
+      }),
+    }), config, env.DB!);
+    expect(firstRefresh.status).toBe(200);
+
+    const replayedRefresh = await handleToken(new Request('https://memory.example.com/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: tokenBody.refresh_token,
+        client_id: clientId,
+      }),
+    }), config, env.DB!);
+    expect(replayedRefresh.status).toBe(400);
+    expect((await replayedRefresh.json() as { error_description: string }).error_description).toBe('Refresh token is invalid or expired');
   });
 
   it('rejects bad csrf and invalid keys', async () => {
