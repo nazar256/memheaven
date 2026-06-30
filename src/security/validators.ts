@@ -5,7 +5,6 @@ const LOCALHOST_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 const EXACT_HTTPS_REDIRECT_URIS = new Set([
   'https://chatgpt.com/connector_platform_oauth_redirect',
   'https://claude.ai/api/mcp/auth_callback',
-  'https://vscode.dev/redirect',
 ]);
 const CHATGPT_CONNECTOR_REDIRECT_PATH = /^\/connector\/oauth\/[A-Za-z0-9_-]+$/;
 

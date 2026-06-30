@@ -4,6 +4,8 @@ export interface VectorMetadata extends Record<string, unknown> {
   tenant_id: string;
   drawer_id?: string;
   diary_id?: string;
+  agent_name?: string;
+  topic?: string;
   chunk_index: number;
   wing?: string;
   room?: string;
@@ -16,6 +18,8 @@ export interface QueryVectorOptions {
   topK: number;
   wing?: string;
   room?: string;
+  agentName?: string;
+  topic?: string;
   kind?: VectorMetadata['kind'];
 }
 
@@ -73,6 +77,12 @@ export async function queryVectors(
   }
   if (options.room) {
     filter.room = options.room;
+  }
+  if (options.agentName) {
+    filter.agent_name = options.agentName;
+  }
+  if (options.topic) {
+    filter.topic = options.topic;
   }
   if (options.kind) {
     filter.kind = options.kind;

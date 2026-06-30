@@ -54,6 +54,7 @@ export interface DuplicateInput {
 interface DrawerSearchRow extends DrawerChunkRecord {
   wing: string;
   room: string;
+  title: string | null;
   source_file: string | null;
   updated_at: string;
   drawer_created_at: string;
@@ -61,11 +62,200 @@ interface DrawerSearchRow extends DrawerChunkRecord {
   r2_key: string;
 }
 
+interface RankedDrawerCandidate {
+  hit: { id: string; score: number };
+  row: DrawerSearchRow;
+  rankScore: number;
+}
+
+const LEXICAL_FALLBACK_CANDIDATE_LIMIT = 200;
+
 function previewText(text: string, maxChars: number): string {
   if (text.length <= maxChars) {
     return text;
   }
   return `${text.slice(0, Math.max(0, maxChars - 1))}…`;
+}
+
+function tokenizeForSearch(text: string): string[] {
+  return text
+    .toLowerCase()
+    .match(/[a-z0-9][a-z0-9._:-]*/g) ?? [];
+}
+
+function uniqueItems<T>(items: T[]): T[] {
+  return Array.from(new Set(items));
+}
+
+function quotedPhrases(query: string): string[] {
+  const phrases: string[] = [];
+  const pattern = /"([^"]+)"|'([^']+)'|`([^`]+)`/g;
+  for (const match of query.matchAll(pattern)) {
+    const phrase = (match[1] ?? match[2] ?? match[3] ?? '').trim().toLowerCase();
+    if (phrase.length >= 2) {
+      phrases.push(phrase);
+    }
+  }
+  return uniqueItems(phrases);
+}
+
+function identifierTokens(query: string): string[] {
+  const tokens = query.match(/[A-Za-z][A-Za-z0-9_-]*\b|\b[A-Z0-9]{2,}(?:-[0-9]+)?\b/g) ?? [];
+  return uniqueItems(tokens.filter((token) => (
+    /[A-Z]/.test(token)
+    || /\d/.test(token)
+    || token.includes('-')
+    || token.includes('_')
+  )).map((token) => token.toLowerCase()));
+}
+
+function candidateText(row: DrawerSearchRow): string {
+  return [
+    row.title,
+    row.wing,
+    row.room,
+    row.source_file,
+    row.chunk_text,
+  ].filter(Boolean).join('\n').toLowerCase();
+}
+
+function bm25Scores(query: string, rows: DrawerSearchRow[]): Map<string, number> {
+  const queryTerms = uniqueItems(tokenizeForSearch(query).filter((token) => token.length > 1));
+  const documents = rows.map((row) => tokenizeForSearch(candidateText(row)));
+  if (queryTerms.length === 0 || documents.length === 0) {
+    return new Map();
+  }
+
+  const averageLength = documents.reduce((sum, tokens) => sum + tokens.length, 0) / documents.length || 1;
+  const documentFrequencies = new Map<string, number>();
+  for (const term of queryTerms) {
+    documentFrequencies.set(term, documents.filter((tokens) => tokens.includes(term)).length);
+  }
+
+  const rawScores = new Map<string, number>();
+  const k1 = 1.5;
+  const b = 0.75;
+  rows.forEach((row, index) => {
+    const tokens = documents[index] ?? [];
+    const termCounts = new Map<string, number>();
+    for (const token of tokens) {
+      termCounts.set(token, (termCounts.get(token) ?? 0) + 1);
+    }
+    let score = 0;
+    for (const term of queryTerms) {
+      const frequency = termCounts.get(term) ?? 0;
+      if (frequency === 0) {
+        continue;
+      }
+      const containingDocuments = documentFrequencies.get(term) ?? 0;
+      const idf = Math.log(1 + (documents.length - containingDocuments + 0.5) / (containingDocuments + 0.5));
+      const denominator = frequency + k1 * (1 - b + b * (tokens.length / averageLength));
+      score += idf * ((frequency * (k1 + 1)) / denominator);
+    }
+    rawScores.set(row.vector_id, score);
+  });
+
+  const maxScore = Math.max(...rawScores.values(), 0);
+  if (maxScore <= 0) {
+    return new Map();
+  }
+  return new Map([...rawScores.entries()].map(([id, score]) => [id, score / maxScore]));
+}
+
+function recencyScore(query: string, row: DrawerSearchRow, newestTime: number, oldestTime: number): number {
+  if (!/\b(latest|recent|currently|current|last time|this week|this month|newest|today|yesterday)\b/i.test(query)) {
+    return 0;
+  }
+  const time = Date.parse(row.updated_at || row.drawer_created_at);
+  if (!Number.isFinite(time) || newestTime <= oldestTime) {
+    return 0;
+  }
+  return (time - oldestTime) / (newestTime - oldestTime);
+}
+
+function rerankDrawerCandidates(query: string, hits: Array<{ id: string; score: number }>, rows: DrawerSearchRow[]): RankedDrawerCandidate[] {
+  const rowByVectorId = new Map(rows.map((row) => [row.vector_id, row]));
+  const candidateRows = hits.map((hit) => rowByVectorId.get(hit.id)).filter(Boolean) as DrawerSearchRow[];
+  const bm25ByVectorId = bm25Scores(query, candidateRows);
+  const phrases = quotedPhrases(query);
+  const identifiers = identifierTokens(query);
+  const timestamps = candidateRows.map((row) => Date.parse(row.updated_at || row.drawer_created_at)).filter(Number.isFinite);
+  const oldestTime = Math.min(...timestamps);
+  const newestTime = Math.max(...timestamps);
+
+  const rankedByDrawer = new Map<string, RankedDrawerCandidate>();
+  for (const hit of hits) {
+    const row = rowByVectorId.get(hit.id);
+    if (!row) {
+      continue;
+    }
+    const haystack = candidateText(row);
+    const phraseBoost = phrases.some((phrase) => haystack.includes(phrase)) ? 0.18 : 0;
+    const identifierBoost = identifiers.some((token) => new RegExp(`(^|[^a-z0-9_-])${escapeRegExp(token)}([^a-z0-9_-]|$)`, 'i').test(haystack)) ? 0.18 : 0;
+    const rankScore = (hit.score * 0.46)
+      + ((bm25ByVectorId.get(hit.id) ?? 0) * 0.32)
+      + phraseBoost
+      + identifierBoost
+      + (recencyScore(query, row, newestTime, oldestTime) * 0.04);
+    const candidate = { hit, row, rankScore };
+    const existing = rankedByDrawer.get(row.drawer_id);
+    if (!existing || compareRankedCandidates(candidate, existing) < 0) {
+      rankedByDrawer.set(row.drawer_id, candidate);
+    }
+  }
+
+  return [...rankedByDrawer.values()].sort(compareRankedCandidates);
+}
+
+function lexicalFallbackHits(
+  query: string,
+  rows: DrawerSearchRow[],
+  existingVectorIds: Set<string>,
+  maxDistance: number | undefined,
+): Array<{ id: string; score: number }> {
+  const queryTerms = uniqueItems(tokenizeForSearch(query).filter((token) => token.length > 1));
+  const phrases = quotedPhrases(query);
+  const identifiers = identifierTokens(query);
+  const bm25ByVectorId = bm25Scores(query, rows);
+  const hits: Array<{ id: string; score: number }> = [];
+
+  for (const row of rows) {
+    if (existingVectorIds.has(row.vector_id)) {
+      continue;
+    }
+    const haystack = candidateText(row);
+    const matchedTermRatio = queryTerms.length === 0
+      ? 0
+      : queryTerms.filter((term) => haystack.includes(term)).length / queryTerms.length;
+    const phraseScore = phrases.some((phrase) => haystack.includes(phrase)) ? 1 : 0;
+    const identifierScore = identifiers.some((token) => new RegExp(`(^|[^a-z0-9_-])${escapeRegExp(token)}([^a-z0-9_-]|$)`, 'i').test(haystack)) ? 1 : 0;
+    const lexicalScore = ((bm25ByVectorId.get(row.vector_id) ?? 0) * 0.55)
+      + (matchedTermRatio * 0.25)
+      + (phraseScore * 0.1)
+      + (identifierScore * 0.1);
+    if (lexicalScore <= 0) {
+      continue;
+    }
+    const score = Math.min(0.86, 0.45 + (lexicalScore * 0.4));
+    if (maxDistance !== undefined && (1 - score) > maxDistance) {
+      continue;
+    }
+    hits.push({ id: row.vector_id, score });
+  }
+
+  return hits.sort((left, right) => right.score - left.score);
+}
+
+function compareRankedCandidates(left: RankedDrawerCandidate, right: RankedDrawerCandidate): number {
+  return (right.rankScore - left.rankScore)
+    || (right.hit.score - left.hit.score)
+    || left.row.drawer_created_at.localeCompare(right.row.drawer_created_at)
+    || left.row.drawer_id.localeCompare(right.row.drawer_id)
+    || left.row.chunk_index - right.row.chunk_index;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function deriveTitle(content: string): string | null {
@@ -193,6 +383,36 @@ async function listChunkRows(db: D1DatabaseLike, tenantId: string, drawerId: str
       where tenant_id = ? and drawer_id = ?
       order by chunk_index asc`,
     [tenantId, drawerId],
+  );
+}
+
+async function listLexicalCandidateRows(
+  db: D1DatabaseLike,
+  tenantId: string,
+  wing: string | undefined,
+  room: string | undefined,
+): Promise<DrawerSearchRow[]> {
+  const filters = ['c.tenant_id = ?', 'd.deleted_at is null'];
+  const values: unknown[] = [tenantId];
+  if (wing) {
+    filters.push('d.wing = ?');
+    values.push(wing);
+  }
+  if (room) {
+    filters.push('d.room = ?');
+    values.push(room);
+  }
+
+  return queryAll<DrawerSearchRow>(
+    db,
+    `select c.id, c.tenant_id, c.drawer_id, c.chunk_index, c.vector_id, c.chunk_text, c.chunk_chars, c.created_at,
+            d.wing, d.room, d.title, d.source_file, d.updated_at, d.created_at as drawer_created_at, d.deleted_at, d.r2_key
+       from drawer_chunks c
+       join drawers d on d.id = c.drawer_id and d.tenant_id = c.tenant_id
+      where ${filters.join(' and ')}
+      order by d.updated_at desc, c.chunk_index asc
+      limit ?`,
+    [...values, LEXICAL_FALLBACK_CANDIDATE_LIMIT],
   );
 }
 
@@ -514,7 +734,10 @@ export async function searchDrawers(env: AppEnv, config: AppConfig, auth: Tenant
   if (!query) {
     throw new Error('query is required');
   }
+  const wing = input.wing ? sanitizeSimpleText(input.wing, 'wing') : undefined;
+  const room = input.room ? sanitizeSimpleText(input.room, 'room') : undefined;
   const limit = Math.min(Math.max(1, input.limit ?? config.searchDefaultLimit), config.searchMaxLimit);
+  const candidateLimit = Math.min(config.searchMaxLimit, Math.max(limit * 5, limit + 20));
   const vectorReservationDay = await reserveQuota(db, config, auth.tenantId, 'vector_queries', 1);
   const embeddingReservationDay = await reserveQuota(db, config, auth.tenantId, 'embedding_input_chars', query.length);
 
@@ -523,12 +746,15 @@ export async function searchDrawers(env: AppEnv, config: AppConfig, auth: Tenant
     const vector = await embedText(env, config, query);
     const queryOptions = {
       tenantId: auth.tenantId,
-      topK: limit,
+      topK: candidateLimit,
       kind: 'drawer' as const,
-      ...(input.wing ? { wing: input.wing } : {}),
-      ...(input.room ? { room: input.room } : {}),
+      ...(wing ? { wing } : {}),
+      ...(room ? { room } : {}),
     };
     hits = await queryVectors(env, config, vector, queryOptions);
+    if (input.max_distance !== undefined) {
+      hits = hits.filter((hit) => (1 - hit.score) <= input.max_distance!);
+    }
     await consumeQuotaReservation(db, auth.tenantId, 'vector_queries', 1, vectorReservationDay);
     await consumeQuotaReservation(db, auth.tenantId, 'embedding_input_chars', query.length, embeddingReservationDay);
   } catch (error) {
@@ -537,28 +763,36 @@ export async function searchDrawers(env: AppEnv, config: AppConfig, auth: Tenant
     throw error;
   }
 
-  if (hits.length === 0) {
-    return { query, filters: { wing: input.wing ?? null, room: input.room ?? null }, results: [] as SearchResultItem[] };
+  const vectorIds = hits.map((hit) => hit.id);
+  const vectorRows = vectorIds.length === 0
+    ? []
+    : await queryAll<DrawerSearchRow>(
+      db,
+      `select c.id, c.tenant_id, c.drawer_id, c.chunk_index, c.vector_id, c.chunk_text, c.chunk_chars, c.created_at,
+              d.wing, d.room, d.title, d.source_file, d.updated_at, d.created_at as drawer_created_at, d.deleted_at, d.r2_key
+         from drawer_chunks c
+         join drawers d on d.id = c.drawer_id and d.tenant_id = c.tenant_id
+        where c.tenant_id = ? and c.vector_id in (${placeholders(vectorIds.length)}) and d.deleted_at is null`,
+      [auth.tenantId, ...vectorIds],
+    );
+  const lexicalRows = await listLexicalCandidateRows(db, auth.tenantId, wing, room);
+  const rowByVectorId = new Map([...vectorRows, ...lexicalRows].map((row) => [row.vector_id, row]));
+  const hitByVectorId = new Map(hits.map((hit) => [hit.id, hit]));
+  for (const fallbackHit of lexicalFallbackHits(query, lexicalRows, new Set(hitByVectorId.keys()), input.max_distance)) {
+    hitByVectorId.set(fallbackHit.id, fallbackHit);
   }
 
-  const vectorIds = hits.map((hit) => hit.id);
-  const rows = await queryAll<DrawerSearchRow>(
-    db,
-    `select c.id, c.tenant_id, c.drawer_id, c.chunk_index, c.vector_id, c.chunk_text, c.chunk_chars, c.created_at,
-            d.wing, d.room, d.source_file, d.updated_at, d.created_at as drawer_created_at, d.deleted_at, d.r2_key
-       from drawer_chunks c
-       join drawers d on d.id = c.drawer_id and d.tenant_id = c.tenant_id
-      where c.tenant_id = ? and c.vector_id in (${placeholders(vectorIds.length)}) and d.deleted_at is null`,
-    [auth.tenantId, ...vectorIds],
-  );
-  const rowByVectorId = new Map(rows.map((row) => [row.vector_id, row]));
+  const combinedHits = [...hitByVectorId.values()];
+  const rows = [...rowByVectorId.values()];
+  if (combinedHits.length === 0 || rows.length === 0) {
+    return { query, filters: { wing: wing ?? null, room: room ?? null }, results: [] as SearchResultItem[] };
+  }
+
+  const rankedCandidates = rerankDrawerCandidates(query, combinedHits, rows).slice(0, limit);
 
   const results: SearchResultItem[] = [];
-  for (const hit of hits) {
-    const row = rowByVectorId.get(hit.id);
-    if (!row) {
-      continue;
-    }
+  for (const candidate of rankedCandidates) {
+    const { hit, row } = candidate;
     const fullContent = (await getText(bucket, row.r2_key)) ?? row.chunk_text;
     results.push({
       drawer_id: row.drawer_id,
@@ -576,7 +810,7 @@ export async function searchDrawers(env: AppEnv, config: AppConfig, auth: Tenant
   await incrementUsage(db, auth.tenantId, { memory_reads: results.length, r2_reads: results.length });
   return {
     query,
-    filters: { wing: input.wing ?? null, room: input.room ?? null },
+    filters: { wing: wing ?? null, room: room ?? null },
     results,
     context_received: input.context ?? null,
   };
@@ -733,21 +967,24 @@ export async function drawerStats(env: AppEnv, auth: TenantAuthContext) {
 
 export function aaakSpecText(): string {
   return [
-    'AAAK in this Cloudflare port is a concise, human-readable memory note dialect for durable facts, preferences, decisions, and session summaries.',
-    'Store raw drawer and diary content verbatim; AAAK is guidance for concise summaries, not a replacement for source-of-truth memory bodies.',
-    'Recommended summary shape: who/what, durable fact or decision, timeframe, confidence/source, and any invalidation note when facts change.',
+    'Compact memory-note guidance: write concise, readable plain text for durable facts, preferences, decisions, unresolved questions, and session summaries.',
+    'Do not prefix normal drawer or diary entries with "AAAK:" unless the user explicitly requests that literal format.',
+    'Do not convert verbatim source content into AAAK; source-of-truth drawer and diary bodies are stored exactly as provided.',
+    'Good compact notes include who/what, the durable fact or decision, timeframe, source/confidence, and any invalidation note when facts changed.',
     'When facts change, invalidate the old fact first and then add the new fact to avoid contradictions.',
   ].join('\n');
 }
 
 export function memoryProtocolLines(): string[] {
   return [
-    'On first memory use in a conversation, call mempalace_status.',
+    'For memory-relevant chats, start with mempalace_wake_context: use mode="global" for safe cross-context orientation or mode="scoped" with an explicit wing when project/topic context is known.',
+    'Use mempalace_status for diagnostics, protocol text, quotas, and backend capabilities; do not treat status counts as wake-up memory context.',
     'Before answering about people, projects, preferences, prior decisions, or past events, search memory first.',
     'Do not search memory for generic public knowledge questions.',
     'Prefer one precise search; use up to three searches for deeper recall.',
     'If memory search returns nothing, say memory did not contain the answer instead of guessing from memory.',
     'Write memory only for durable facts, decisions, preferences, unresolved questions, and concise session summaries.',
+    'Write normal drawer and diary entries as concise, readable plain text; do not prefix them with "AAAK:" unless the user explicitly asks for that literal format.',
     'Do not store full transcripts by default.',
     'Keep entries concise.',
     'Before adding new memory, check duplicates when appropriate.',

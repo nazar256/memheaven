@@ -29,8 +29,11 @@
 - [x] DOC-030 Finalize README deployment guide, decisions log, AGENTS pointers, project state, and continuation handoff
 - [x] QA-010 Run tests, typecheck, build, deploy dry-run, review readiness, and update `CONTINUE.md`
 
-## Follow-up candidates
+## Reconciled follow-up candidates
 
-- [ ] FUT-010 Add optional generic `search` / `fetch` aliases if real connector UX needs them
-- [ ] FUT-020 Add a fully remote, credentialed operator workflow for bulk drawer reindexing
-- [ ] FUT-030 Add production smoke automation against a deployed preview environment
+- [x] FUT-010 Add optional generic `search` / `fetch` aliases if real connector UX needs them
+  - Deferred by D-007 until real connector UX evidence shows generic aliases are needed.
+- [x] FUT-020 Add a fully remote, credentialed operator workflow for bulk drawer reindexing
+  - Satisfied by `npm run reindex`, which uses a bearer token and the remote MCP API for drawer and diary maintenance reindexing.
+- [x] FUT-030 Add production smoke automation against a deployed preview environment
+  - Satisfied by `npm run eval:remote` plus manual `.github/workflows/remote-smoke.yml` automation for configured deployment secrets.

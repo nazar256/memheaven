@@ -97,6 +97,7 @@ Important:
 Run:
 
 ```bash
+cp wrangler.toml.example wrangler.toml
 npm run init -- --base-url https://memheaven.<your-workers-subdomain>.workers.dev
 ```
 
@@ -110,7 +111,7 @@ This command will:
 - patch the OAuth/MCP URLs in `wrangler.toml`
 - apply remote D1 migrations by default
 
-After `npm run init -- --base-url ...`, your local `wrangler.toml` may contain account-specific deployment values. Do not commit those values back to a public fork.
+`wrangler.toml` is intentionally gitignored because it contains local/account-specific deployment values after initialization. Commit changes to `wrangler.toml.example` when shared defaults change.
 
 If you just want to see what it would do:
 
@@ -199,7 +200,7 @@ MemHeaven's ChatGPT path has been manually verified narrowly for the `/mcp` URL,
 
 ### Claude-family hosted connectors (expected / experimental)
 
-MemHeaven is protocol-compatible with hosted remote MCP clients, and the current callback allowlist includes Anthropic's documented hosted callback plus localhost loopback flows.
+MemHeaven is protocol-compatible with hosted remote MCP clients, and the current callback allowlist includes Claude.ai's known exact hosted callback plus localhost loopback flows.
 
 Before using Claude.ai or Claude Desktop remote connectors, review:
 

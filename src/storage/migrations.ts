@@ -73,9 +73,24 @@ create table if not exists diary_entries(
   tenant_id text not null,
   agent_name text not null,
   topic text not null,
+  wing text not null,
+  room text not null default 'diary',
   r2_key text not null,
   content_hash text not null,
-  created_at text not null
+  created_at text not null,
+  updated_at text not null
+);
+
+create table if not exists diary_chunks(
+  id text primary key,
+  tenant_id text not null,
+  diary_id text not null,
+  chunk_index integer not null,
+  vector_id text not null,
+  chunk_text text not null,
+  chunk_chars integer not null,
+  created_at text not null,
+  foreign key(diary_id) references diary_entries(id)
 );
 
 create table if not exists usage_counters(
@@ -110,4 +125,7 @@ create index if not exists idx_kg_validity on kg_triples(tenant_id, valid_from, 
 create index if not exists idx_tunnels_source on tunnels(tenant_id, source_wing, source_room);
 create index if not exists idx_tunnels_target on tunnels(tenant_id, target_wing, target_room);
 create index if not exists idx_diary_agent_time on diary_entries(tenant_id, agent_name, created_at);
+create index if not exists idx_diary_scope_time on diary_entries(tenant_id, agent_name, wing, room, topic, created_at);
+create index if not exists idx_diary_chunks_tenant_diary on diary_chunks(tenant_id, diary_id);
+create index if not exists idx_diary_chunks_tenant_vector on diary_chunks(tenant_id, vector_id);
 `;

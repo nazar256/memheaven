@@ -4,11 +4,13 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-const REQUIRED_METADATA_INDEXES = [
+export const REQUIRED_METADATA_INDEXES = [
   { propertyName: 'tenant_id', type: 'string' },
   { propertyName: 'wing', type: 'string' },
   { propertyName: 'room', type: 'string' },
   { propertyName: 'kind', type: 'string' },
+  { propertyName: 'agent_name', type: 'string' },
+  { propertyName: 'topic', type: 'string' },
 ] as const;
 
 interface BootstrapOptions {

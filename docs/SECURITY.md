@@ -60,7 +60,7 @@ Every storage layer is tenant-scoped:
 
 ## Recommended redirect allowlist
 
-The current MemHeaven repo defaults are intentionally conservative: exact documented ChatGPT, Claude, and VS Code hosted callback contracts plus localhost loopback callbacks for development and CLI-style OAuth flows.
+The current MemHeaven repo defaults are intentionally conservative: exact documented ChatGPT and Claude hosted callback contracts plus localhost loopback callbacks for development and CLI-style OAuth flows.
 
 If you expand redirect support for additional MCP clients, prefer a **narrow allowlist** like this:
 
@@ -68,7 +68,6 @@ If you expand redirect support for additional MCP clients, prefer a **narrow all
 ^https://claude\.ai/api/mcp/auth_callback$
 ^https://chatgpt\.com/connector/oauth/[A-Za-z0-9_-]+$
 ^https://chatgpt\.com/connector_platform_oauth_redirect$
-^https://vscode\.dev/redirect$
 loopback http redirects on localhost / 127.0.0.1 / [::1] with any port and path for local IDE, CLI, and browser OAuth flows
 ```
 
@@ -76,7 +75,7 @@ loopback http redirects on localhost / 127.0.0.1 / [::1] with any port and path 
 
 - Do **not** allow broad `https://chatgpt.com/.*`
 - Do **not** allow broad `https://claude.ai/.*`
-- Do **not** allow broad `https://vscode.dev/.*`
+- Do **not** allow `https://vscode.dev/redirect` or broad `https://vscode.dev/.*` without an exact current callback contract
 - Do **not** add speculative hosted domains such as `grok.com`, `x.ai`, `api.x.ai`, `perplexity.ai`, or `abacus.ai`
 - Do **not** allow broad custom schemes
 - Do **not** pre-allowlist clients with undocumented callback contracts

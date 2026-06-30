@@ -1,0 +1,26 @@
+name: Remote Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Optional smoke namespace suffix
+        required: false
+        type: string
+
+jobs:
+  remote-smoke:
+    runs-on: ubuntu-latest
+    env:
+      MEMHEAVEN_EVAL_BASE_URL: ${{ secrets.MEMHEAVEN_EVAL_BASE_URL }}
+      MEMHEAVEN_EVAL_BEARER_TOKEN: ${{ secrets.MEMHEAVEN_EVAL_BEARER_TOKEN }}
+      MEMHEAVEN_EVAL_BEARER_TOKEN_B: ${{ secrets.MEMHEAVEN_EVAL_BEARER_TOKEN_B }}
+      MEMHEAVEN_EVAL_RUN_ID: ${{ inputs.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm install --no-fund --no-audit
+      - run: npm run eval:remote

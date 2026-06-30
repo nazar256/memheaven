@@ -7,6 +7,7 @@ import {
   parseR2BucketNames,
   parseVectorizeListOutput,
   patchD1DatabaseId,
+  REQUIRED_METADATA_INDEXES,
 } from '../scripts/bootstrap';
 
 describe('bootstrap script helpers', () => {
@@ -104,5 +105,16 @@ MCP_AUDIENCE = "https://memory.example.com/mcp"
 `);
 
     expect(() => patchPublicBaseUrl(config, 'https://memory.example.com/mcp')).toThrow('origin only');
+  });
+
+  it('includes every metadata filter used by drawer and diary Vectorize queries', () => {
+    expect(REQUIRED_METADATA_INDEXES.map((index) => index.propertyName)).toEqual([
+      'tenant_id',
+      'wing',
+      'room',
+      'kind',
+      'agent_name',
+      'topic',
+    ]);
   });
 });

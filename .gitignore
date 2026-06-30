@@ -4,3 +4,4 @@ dist/
 .wrangler/
 coverage/
 *.log
+wrangler.toml

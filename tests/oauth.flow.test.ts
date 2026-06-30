@@ -29,8 +29,8 @@ describe('oauth flow', async () => {
     const allowedRedirects = [
       redirectUri,
       'https://chatgpt.com/connector/oauth/test-client',
+      'https://chatgpt.com/connector/oauth/Az_09-test',
       'https://claude.ai/api/mcp/auth_callback',
-      'https://vscode.dev/redirect',
       'http://localhost:8787/callback',
       'http://127.0.0.1:33418/callback',
       'http://[::1]:4312/callback',
@@ -49,6 +49,7 @@ describe('oauth flow', async () => {
       'https://evil.example.com/callback',
       'https://chatgpt.com.evil.com/connector_platform_oauth_redirect',
       'https://claude.ai.evil.com/api/mcp/auth_callback',
+      'https://vscode.dev/redirect',
       'https://vscode.dev/evil',
       'https://claude.ai/api/mcp/auth_callback/extra',
       'https://chatgpt.com/connector_platform_oauth_redirect/extra',

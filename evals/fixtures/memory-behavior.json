@@ -1,0 +1,185 @@
+{
+  "version": "memory-behavior.v1",
+  "notes": [
+    "Synthetic MemHeaven self-eval fixture. Do not replace with real user memories.",
+    "Retrieval quality metrics are a fake-embedding baseline, not a product claim.",
+    "PER-31 hybrid reranking and PER-33 KG warnings are future work and are not enforced here."
+  ],
+  "drawers": [
+    {
+      "fixture_id": "a-global-profile-yurii",
+      "tenant": "tenant-a",
+      "wing": "global",
+      "room": "profile",
+      "content": "Yurii is the MemHeaven maintainer and prefers explicit behavior over cleverness. Durable profile note for wake context tests."
+    },
+    {
+      "fixture_id": "a-global-preferences-reviewability",
+      "tenant": "tenant-a",
+      "wing": "global",
+      "room": "preferences",
+      "content": "Yurii prefers reviewable, maintainable code with straightforward control flow and clear validation evidence."
+    },
+    {
+      "fixture_id": "a-project-memheaven-per30",
+      "tenant": "tenant-a",
+      "wing": "projects",
+      "room": "memheaven",
+      "content": "PER-30 added mempalace_wake_context with global and scoped modes. Scoped mode requires an explicit wing and must not widen on empty results."
+    },
+    {
+      "fixture_id": "a-project-memheaven-per32",
+      "tenant": "tenant-a",
+      "wing": "projects",
+      "room": "memheaven",
+      "content": "PER-32 hardened KG temporal invalidation. ended earlier than valid_from is rejected before mutation and timelines preserve historical facts."
+    },
+    {
+      "fixture_id": "a-project-memheaven-r2-d1",
+      "tenant": "tenant-a",
+      "wing": "projects",
+      "room": "memheaven",
+      "content": "MemHeaven stores verbatim drawer bodies in R2 while D1 and Vectorize are supporting metadata and search indexes."
+    },
+    {
+      "fixture_id": "a-project-memheaven-oauth",
+      "tenant": "tenant-a",
+      "wing": "projects",
+      "room": "memheaven",
+      "content": "OAuth uses stateless authorization codes, PKCE, access-key consent, and exact redirect validation for hosted MCP clients."
+    },
+    {
+      "fixture_id": "a-project-memheaven-aaak",
+      "tenant": "tenant-a",
+      "wing": "projects",
+      "room": "memheaven",
+      "content": "Compact memory guidance says normal drawer and diary entries should be concise readable plain text, not prefixed with AAAK:."
+    },
+    {
+      "fixture_id": "a-work-aurora-deploy",
+      "tenant": "tenant-a",
+      "wing": "work",
+      "room": "aurora",
+      "content": "Project Aurora deployment checklist uses Wrangler dry-run, staging health checks, and incident note AUR-445 before release."
+    },
+    {
+      "fixture_id": "a-work-aurora-db",
+      "tenant": "tenant-a",
+      "wing": "work",
+      "room": "aurora",
+      "content": "Aurora database decision: keep D1 migrations append-only and avoid table rebuilds during Friday deployments."
+    },
+    {
+      "fixture_id": "a-work-crm-oauth",
+      "tenant": "tenant-a",
+      "wing": "work",
+      "room": "crm",
+      "content": "CRM connector issue CRM-118 tracks OAuth callback allowlist cleanup and bearer-token fallback documentation."
+    },
+    {
+      "fixture_id": "a-personal-travel-kyoto",
+      "tenant": "tenant-a",
+      "wing": "personal",
+      "room": "travel",
+      "content": "Kyoto itinerary preference: quiet temples in the morning, ramen near Nishiki Market, and no packed late-night schedule."
+    },
+    {
+      "fixture_id": "a-personal-health-cycling",
+      "tenant": "tenant-a",
+      "wing": "personal",
+      "room": "health",
+      "content": "Cycling preference: short weekday rides are better than ambitious weekend plans when project deadlines are active."
+    },
+    {
+      "fixture_id": "a-research-vector-bm25",
+      "tenant": "tenant-a",
+      "wing": "research",
+      "room": "retrieval",
+      "content": "Hybrid search research compares Vectorize semantic scores with candidate-local BM25 and quoted phrase boosts."
+    },
+    {
+      "fixture_id": "a-research-identifiers",
+      "tenant": "tenant-a",
+      "wing": "research",
+      "room": "retrieval",
+      "content": "Identifier recall cases should include PER-30, D1, R2, OAuth, Vectorize, and code identifier KV_NAMESPACE_TEST."
+    },
+    {
+      "fixture_id": "a-project-luna-api",
+      "tenant": "tenant-a",
+      "wing": "projects",
+      "room": "luna",
+      "content": "Project Luna API uses endpoint /v1/luna/sync and the exact phrase silver lantern handshake for smoke tests."
+    },
+    {
+      "fixture_id": "a-project-luna-decision",
+      "tenant": "tenant-a",
+      "wing": "projects",
+      "room": "luna",
+      "content": "Luna decision: prefer deterministic retries over background queue magic until operational metrics are available."
+    },
+    {
+      "fixture_id": "b-project-memheaven-shadow",
+      "tenant": "tenant-b",
+      "wing": "projects",
+      "room": "memheaven",
+      "content": "Tenant B shadow memory mentions PER-30, OAuth, and MemHeaven but must never appear in tenant A eval results."
+    },
+    {
+      "fixture_id": "b-personal-travel-kyoto",
+      "tenant": "tenant-b",
+      "wing": "personal",
+      "room": "travel",
+      "content": "Tenant B Kyoto note: visit Fushimi Inari at sunrise and book a sushi class. This must stay isolated."
+    },
+    {
+      "fixture_id": "b-work-aurora-private",
+      "tenant": "tenant-b",
+      "wing": "work",
+      "room": "aurora",
+      "content": "Tenant B Aurora private deployment uses release train BETA-77 and separate credentials."
+    }
+  ],
+  "retrieval_cases": [
+    { "id": "recall-memheaven-r2", "tenant": "tenant-a", "query": "where are verbatim drawer bodies stored", "limit": 5, "expected_any_fixture_ids": ["a-project-memheaven-r2-d1"], "tags": ["semantic"] },
+    { "id": "recall-wake-context-per30", "tenant": "tenant-a", "query": "PER-30 wake context scoped mode explicit wing", "limit": 5, "expected_any_fixture_ids": ["a-project-memheaven-per30"], "tags": ["identifier"] },
+    { "id": "recall-kg-invalidation-per32", "tenant": "tenant-a", "query": "KG invalidation rejects ended earlier than valid_from", "limit": 5, "expected_any_fixture_ids": ["a-project-memheaven-per32"], "tags": ["identifier", "kg"] },
+    { "id": "recall-oauth-pkce", "tenant": "tenant-a", "query": "OAuth PKCE access key consent redirect validation", "limit": 5, "expected_any_fixture_ids": ["a-project-memheaven-oauth"], "tags": ["identifier"] },
+    { "id": "recall-aaak-guidance", "tenant": "tenant-a", "query": "should normal memories be prefixed AAAK", "limit": 5, "expected_any_fixture_ids": ["a-project-memheaven-aaak"], "tags": ["exact_phrase"] },
+    { "id": "recall-reviewability-preference", "tenant": "tenant-a", "query": "reviewable maintainable code preference", "limit": 5, "expected_any_fixture_ids": ["a-global-preferences-reviewability"], "tags": ["preference"] },
+    { "id": "recall-yurii-profile", "tenant": "tenant-a", "query": "who maintains MemHeaven and prefers explicit behavior", "limit": 5, "expected_any_fixture_ids": ["a-global-profile-yurii"], "tags": ["profile"] },
+    { "id": "recall-aurora-deploy", "tenant": "tenant-a", "query": "Aurora deployment checklist incident AUR-445", "limit": 5, "expected_any_fixture_ids": ["a-work-aurora-deploy"], "tags": ["identifier"] },
+    { "id": "recall-aurora-d1-migration", "tenant": "tenant-a", "query": "D1 migrations append-only Friday deployments", "limit": 5, "expected_any_fixture_ids": ["a-work-aurora-db"], "tags": ["identifier"] },
+    { "id": "recall-crm-118", "tenant": "tenant-a", "query": "CRM-118 OAuth callback allowlist", "limit": 5, "expected_any_fixture_ids": ["a-work-crm-oauth"], "tags": ["identifier"] },
+    { "id": "recall-kyoto-ramen", "tenant": "tenant-a", "query": "Kyoto ramen near Nishiki Market", "limit": 5, "expected_any_fixture_ids": ["a-personal-travel-kyoto"], "tags": ["semantic"] },
+    { "id": "recall-cycling-deadlines", "tenant": "tenant-a", "query": "cycling preference during project deadlines", "limit": 5, "expected_any_fixture_ids": ["a-personal-health-cycling"], "tags": ["preference"] },
+    { "id": "recall-bm25-research", "tenant": "tenant-a", "query": "candidate-local BM25 quoted phrase boosts", "limit": 5, "expected_any_fixture_ids": ["a-research-vector-bm25"], "tags": ["retrieval"] },
+    { "id": "recall-kv-token", "tenant": "tenant-a", "query": "KV_NAMESPACE_TEST", "limit": 5, "expected_any_fixture_ids": ["a-research-identifiers"], "tags": ["identifier", "code"] },
+    { "id": "recall-luna-api", "tenant": "tenant-a", "query": "/v1/luna/sync silver lantern handshake", "limit": 5, "expected_any_fixture_ids": ["a-project-luna-api"], "tags": ["exact_phrase", "code"] },
+    { "id": "recall-luna-decision", "tenant": "tenant-a", "query": "Luna deterministic retries decision", "limit": 5, "expected_any_fixture_ids": ["a-project-luna-decision"], "tags": ["decision"] },
+    { "id": "scope-projects-memheaven-per30", "tenant": "tenant-a", "query": "PER-30 OAuth MemHeaven", "limit": 5, "wing": "projects", "room": "memheaven", "expected_any_fixture_ids": ["a-project-memheaven-per30", "a-project-memheaven-oauth"], "hard_scope": true, "tags": ["scope", "identifier"] },
+    { "id": "scope-work-aurora", "tenant": "tenant-a", "query": "Aurora D1 deployment", "limit": 5, "wing": "work", "room": "aurora", "expected_any_fixture_ids": ["a-work-aurora-deploy", "a-work-aurora-db"], "hard_scope": true, "tags": ["scope"] },
+    { "id": "scope-personal-travel", "tenant": "tenant-a", "query": "Kyoto itinerary", "limit": 5, "wing": "personal", "room": "travel", "expected_any_fixture_ids": ["a-personal-travel-kyoto"], "hard_scope": true, "tags": ["scope"] },
+    { "id": "scope-research-retrieval", "tenant": "tenant-a", "query": "Vectorize BM25 identifier recall", "limit": 5, "wing": "research", "room": "retrieval", "expected_any_fixture_ids": ["a-research-vector-bm25", "a-research-identifiers"], "hard_scope": true, "tags": ["scope", "retrieval"] },
+    { "id": "scope-global-preferences", "tenant": "tenant-a", "query": "maintainable straightforward validation", "limit": 5, "wing": "global", "room": "preferences", "expected_any_fixture_ids": ["a-global-preferences-reviewability"], "hard_scope": true, "tags": ["scope", "preference"] },
+    { "id": "scope-project-luna", "tenant": "tenant-a", "query": "silver lantern deterministic retries", "limit": 5, "wing": "projects", "room": "luna", "expected_any_fixture_ids": ["a-project-luna-api", "a-project-luna-decision"], "hard_scope": true, "tags": ["scope"] },
+    { "id": "scope-work-crm", "tenant": "tenant-a", "query": "OAuth callback bearer fallback", "limit": 5, "wing": "work", "room": "crm", "expected_any_fixture_ids": ["a-work-crm-oauth"], "hard_scope": true, "tags": ["scope", "identifier"] },
+    { "id": "scope-personal-health", "tenant": "tenant-a", "query": "weekday rides", "limit": 5, "wing": "personal", "room": "health", "expected_any_fixture_ids": ["a-personal-health-cycling"], "hard_scope": true, "tags": ["scope", "preference"] },
+    { "id": "tenant-a-does-not-see-b-shadow", "tenant": "tenant-a", "query": "BETA-77 Tenant B shadow OAuth", "limit": 5, "expected_any_fixture_ids": ["a-project-memheaven-oauth"], "forbid_fixture_ids": ["b-project-memheaven-shadow", "b-work-aurora-private"], "forbid_tenants": ["tenant-b"], "tags": ["tenant_isolation"] },
+    { "id": "tenant-b-kyoto-isolated", "tenant": "tenant-b", "query": "Kyoto sushi class sunrise", "limit": 5, "expected_any_fixture_ids": ["b-personal-travel-kyoto"], "forbid_tenants": ["tenant-a"], "tags": ["tenant_isolation"] },
+    { "id": "tenant-b-aurora-isolated", "tenant": "tenant-b", "query": "Aurora BETA-77 separate credentials", "limit": 5, "expected_any_fixture_ids": ["b-work-aurora-private"], "forbid_tenants": ["tenant-a"], "tags": ["tenant_isolation", "identifier"] },
+    { "id": "tenant-b-memheaven-shadow", "tenant": "tenant-b", "query": "PER-30 OAuth MemHeaven shadow", "limit": 5, "expected_any_fixture_ids": ["b-project-memheaven-shadow"], "forbid_tenants": ["tenant-a"], "tags": ["tenant_isolation", "identifier"] }
+  ],
+  "duplicate_cases": [
+    { "id": "duplicate-exact-same-tenant", "tenant": "tenant-a", "content": "MemHeaven stores verbatim drawer bodies in R2 while D1 and Vectorize are supporting metadata and search indexes.", "threshold": 0.95, "expect_duplicate": true, "expected_fixture_id": "a-project-memheaven-r2-d1" },
+    { "id": "duplicate-foreign-same-theme-isolated", "tenant": "tenant-a", "content": "Tenant B shadow memory mentions PER-30, OAuth, and MemHeaven but must never appear in tenant A eval results.", "threshold": 0.99, "expect_duplicate": false, "forbid_tenants": ["tenant-b"] }
+  ],
+  "kg_cases": [
+    { "id": "kg-current-add-query", "scenario": "current_add_query" },
+    { "id": "kg-invalidate-current-history", "scenario": "invalidate_current_history" },
+    { "id": "kg-open-start-invalidate", "scenario": "open_start_invalidate" },
+    { "id": "kg-as-of-history", "scenario": "as_of_history" },
+    { "id": "kg-inverted-invalidation-rejected", "scenario": "inverted_invalidation_rejected" },
+    { "id": "kg-direction-incoming", "scenario": "direction_incoming" }
+  ]
+}

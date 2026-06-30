@@ -43,7 +43,10 @@
     "keygen": "tsx scripts/generate-access-key.ts",
     "smoke:oauth": "tsx scripts/smoke-oauth.ts",
     "smoke:mcp": "tsx scripts/smoke-mcp.ts",
-    "reindex": "tsx scripts/reindex.ts"
+    "reindex": "tsx scripts/reindex.ts",
+    "eval:local": "tsx scripts/eval-local.ts",
+    "eval:baseline": "tsx scripts/eval-local.ts --compare-baseline evals/baselines/local-fake-vectorize.v1.json",
+    "eval:remote": "tsx scripts/eval-remote.ts"
   },
   "dependencies": {
     "@cfworker/json-schema": "^4.1.1",

@@ -53,8 +53,22 @@ export interface DiaryEntryRecord {
   tenant_id: string;
   agent_name: string;
   topic: string;
+  wing: string;
+  room: string;
   r2_key: string;
   content_hash: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiaryChunkRecord {
+  id: string;
+  tenant_id: string;
+  diary_id: string;
+  chunk_index: number;
+  vector_id: string;
+  chunk_text: string;
+  chunk_chars: number;
   created_at: string;
 }
 
@@ -138,6 +152,18 @@ export interface SearchResultItem {
   chunk_index: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface DiarySearchResultItem {
+  entry_id: string;
+  agent: string;
+  topic: string;
+  wing: string;
+  room: string;
+  timestamp: string;
+  similarity: number;
+  chunk_index: number;
+  preview: string;
 }
 
 export interface DuplicateMatch {

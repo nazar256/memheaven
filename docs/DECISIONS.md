@@ -44,8 +44,8 @@
 
 - Status: Accepted
 - Date: 2026-05-13
-- Decision: `mempalace_update_drawer` supports optional `force_reindex` and the repository ships a `scripts/reindex.ts` helper that calls the MCP API to refresh existing drawer vectors after metadata-index changes.
-- Why: Vectorize metadata indexes may be added after initial ingestion; operators need a deterministic hosted recovery path.
+- Decision: `mempalace_update_drawer` supports optional `force_reindex`, `mempalace_diary_reindex` backfills diary vectors from R2 source bodies, and the repository ships a `scripts/reindex.ts` helper that calls the MCP API to refresh existing drawer or diary vectors after metadata-index and semantic-index changes.
+- Why: Vectorize metadata indexes and diary semantic search may be added after initial ingestion; operators need a deterministic hosted recovery path.
 
 ## D-007: Generic connector aliases are deferred
 

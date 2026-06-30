@@ -82,8 +82,22 @@ type DiaryEntry = {
   tenant_id: string;
   agent_name: string;
   topic: string;
+  wing: string;
+  room: string;
   r2_key: string;
   content_hash: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type DiaryChunk = {
+  id: string;
+  tenant_id: string;
+  diary_id: string;
+  chunk_index: number;
+  vector_id: string;
+  chunk_text: string;
+  chunk_chars: number;
   created_at: string;
 };
 
@@ -139,6 +153,7 @@ type MemoryStore = {
   drawers: Drawer[];
   drawer_chunks: DrawerChunk[];
   diary_entries: DiaryEntry[];
+  diary_chunks: DiaryChunk[];
   kg_entities: KgEntity[];
   kg_triples: KgTriple[];
   tunnels: Tunnel[];
@@ -479,6 +494,31 @@ class FakeStatement implements PreparedStatementLike {
       }
       return [];
     }
+    if (query.includes('from drawer_chunks c') && query.includes('join drawers d') && query.includes('order by d.updated_at desc')) {
+      const values = this.values as unknown[];
+      const tenantId = values[0] as string;
+      const limit = values.at(-1) as number;
+      let valueIndex = 1;
+      let rows = this.store.drawer_chunks.filter((chunk) => chunk.tenant_id === tenantId)
+        .map((chunk) => {
+          const drawer = this.store.drawers.find((item) => item.id === chunk.drawer_id && item.tenant_id === chunk.tenant_id && item.deleted_at === null);
+          if (!drawer) return null;
+          return { ...chunk, wing: drawer.wing, room: drawer.room, title: drawer.title, source_file: drawer.source_file, updated_at: drawer.updated_at, drawer_created_at: drawer.created_at, deleted_at: drawer.deleted_at, r2_key: drawer.r2_key };
+        })
+        .filter(Boolean);
+      if (query.includes('d.wing = ?')) {
+        const wing = values[valueIndex] as string;
+        valueIndex += 1;
+        rows = rows.filter((row) => row?.wing === wing);
+      }
+      if (query.includes('d.room = ?')) {
+        const room = values[valueIndex] as string;
+        rows = rows.filter((row) => row?.room === room);
+      }
+      return rows
+        .sort((a, b) => (b?.updated_at ?? '').localeCompare(a?.updated_at ?? '') || ((a?.chunk_index ?? 0) - (b?.chunk_index ?? 0)))
+        .slice(0, limit) as T[];
+    }
     if (query.includes('from drawer_chunks c') && query.includes('join drawers d')) {
       const tenantId = this.values[0] as string;
       const vectorIds = this.values.slice(1) as string[];
@@ -487,7 +527,7 @@ class FakeStatement implements PreparedStatementLike {
         .map((chunk) => {
           const drawer = this.store.drawers.find((item) => item.id === chunk.drawer_id && item.tenant_id === chunk.tenant_id && item.deleted_at === null);
           if (!drawer) return null;
-          return { ...chunk, wing: drawer.wing, room: drawer.room, source_file: drawer.source_file, updated_at: drawer.updated_at, drawer_created_at: drawer.created_at, deleted_at: drawer.deleted_at, r2_key: drawer.r2_key };
+          return { ...chunk, wing: drawer.wing, room: drawer.room, title: drawer.title, source_file: drawer.source_file, updated_at: drawer.updated_at, drawer_created_at: drawer.created_at, deleted_at: drawer.deleted_at, r2_key: drawer.r2_key };
         })
         .filter(Boolean);
       return rows as T[];
@@ -525,17 +565,73 @@ class FakeStatement implements PreparedStatementLike {
       return [{ total: new Set(this.store.drawers.filter((row) => row.tenant_id === tenantId && row.deleted_at === null).map((row) => `${row.wing}:${row.room}`)).size }] as T[];
     }
     if (query.startsWith('insert into diary_entries')) {
-      const [id, tenantId, agentName, topic, r2Key, contentHash, createdAt] = this.values as [string, string, string, string, string, string, string];
-      this.store.diary_entries.push({ id, tenant_id: tenantId, agent_name: agentName, topic, r2_key: r2Key, content_hash: contentHash, created_at: createdAt });
+      const [id, tenantId, agentName, topic, wing, room, r2Key, contentHash, createdAt, updatedAt] = this.values as [string, string, string, string, string, string, string, string, string, string];
+      this.store.diary_entries.push({ id, tenant_id: tenantId, agent_name: agentName, topic, wing, room, r2_key: r2Key, content_hash: contentHash, created_at: createdAt, updated_at: updatedAt });
       return [];
     }
-    if (query.startsWith('select id, tenant_id, agent_name, topic, r2_key, content_hash, created_at from diary_entries')) {
-      const [tenantId, agentName, limit] = this.values as [string, string, number];
-      return this.store.diary_entries.filter((row) => row.tenant_id === tenantId && row.agent_name === agentName).sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, limit) as T[];
+    if (query.startsWith('insert into diary_chunks')) {
+      const [id, tenantId, diaryId, chunkIndex, vectorId, chunkText, chunkChars, createdAt] = this.values as [string, string, string, number, string, string, number, string];
+      this.store.diary_chunks.push({ id, tenant_id: tenantId, diary_id: diaryId, chunk_index: chunkIndex, vector_id: vectorId, chunk_text: chunkText, chunk_chars: chunkChars, created_at: createdAt });
+      return [];
+    }
+    if (query.startsWith('select id, tenant_id, diary_id, chunk_index, vector_id, chunk_text, chunk_chars, created_at from diary_chunks where tenant_id = ? and diary_id = ?')) {
+      const [tenantId, diaryId] = this.values as [string, string];
+      return this.store.diary_chunks.filter((row) => row.tenant_id === tenantId && row.diary_id === diaryId).sort((a, b) => a.chunk_index - b.chunk_index) as T[];
+    }
+    if (query.startsWith('delete from diary_chunks where tenant_id = ? and diary_id = ?')) {
+      const [tenantId, diaryId] = this.values as [string, string];
+      this.store.diary_chunks = this.store.diary_chunks.filter((row) => !(row.tenant_id === tenantId && row.diary_id === diaryId));
+      return [];
+    }
+    if (query.startsWith('select id, tenant_id, agent_name, topic, wing, room, r2_key, content_hash, created_at, updated_at from diary_entries')) {
+      const values = this.values as unknown[];
+      let rows = filterDiaryEntries(this.store.diary_entries, query, values);
+      rows = query.includes('order by created_at asc')
+        ? rows.sort((a, b) => a.created_at.localeCompare(b.created_at))
+        : rows.sort((a, b) => b.created_at.localeCompare(a.created_at));
+      if (query.includes('limit ? offset ?')) {
+        const limit = values.at(-2) as number;
+        const offset = values.at(-1) as number;
+        return rows.slice(offset, offset + limit) as T[];
+      }
+      const limit = values.at(-1) as number;
+      return rows.slice(0, limit) as T[];
     }
     if (query.startsWith('select count(*) as total from diary_entries')) {
-      const [tenantId, agentName] = this.values as [string, string];
-      return [{ total: this.store.diary_entries.filter((row) => row.tenant_id === tenantId && row.agent_name === agentName).length }] as T[];
+      const rows = filterDiaryEntries(this.store.diary_entries, query, this.values as unknown[]);
+      return [{ total: rows.length }] as T[];
+    }
+    if (query.includes('from diary_chunks c') && query.includes('join diary_entries e')) {
+      const values = this.values as unknown[];
+      const tenantId = values[0] as string;
+      const vectorCount = (query.match(/\?/g)?.length ?? 0) - 2
+        - (query.includes('e.wing = ?') ? 1 : 0)
+        - (query.includes('e.room = ?') ? 1 : 0)
+        - (query.includes('e.topic = ?') ? 1 : 0);
+      const vectorIds = values.slice(1, 1 + vectorCount) as string[];
+      const agentName = values[1 + vectorCount] as string;
+      let filterIndex = 2 + vectorCount;
+      let rows = this.store.diary_chunks
+        .filter((chunk) => chunk.tenant_id === tenantId && vectorIds.includes(chunk.vector_id))
+        .map((chunk) => {
+          const entry = this.store.diary_entries.find((item) => item.id === chunk.diary_id && item.tenant_id === chunk.tenant_id);
+          if (!entry) return null;
+          return { ...chunk, agent_name: entry.agent_name, topic: entry.topic, wing: entry.wing, room: entry.room, r2_key: entry.r2_key, entry_created_at: entry.created_at, updated_at: entry.updated_at };
+        })
+        .filter((row): row is NonNullable<typeof row> => Boolean(row))
+        .filter((row) => row.agent_name === agentName);
+      if (query.includes('e.wing = ?')) {
+        rows = rows.filter((row) => row.wing === values[filterIndex]);
+        filterIndex += 1;
+      }
+      if (query.includes('e.room = ?')) {
+        rows = rows.filter((row) => row.room === values[filterIndex]);
+        filterIndex += 1;
+      }
+      if (query.includes('e.topic = ?')) {
+        rows = rows.filter((row) => row.topic === values[filterIndex]);
+      }
+      return rows as T[];
     }
     if (query.startsWith('select id, tenant_id, name, normalized_name, type, properties_json, created_at, updated_at from kg_entities')) {
       const [tenantId, normalizedName] = this.values as [string, string];
@@ -551,21 +647,46 @@ class FakeStatement implements PreparedStatementLike {
       this.store.kg_triples.push({ id, tenant_id: tenantId, subject, predicate, object, valid_from: validFrom, valid_to: validTo, confidence, source_drawer_id: sourceDrawerId, source_closet: sourceCloset, created_at: createdAt, updated_at: updatedAt });
       return [];
     }
-    if (query.startsWith('update kg_triples')) {
-      const [ended, updatedAt, tenantId, subject, predicate, object] = this.values as [string, string, string, string, string, string, string];
-      for (const row of this.store.kg_triples) {
-        if (row.tenant_id === tenantId && row.subject === subject && row.predicate === predicate && row.object === object && (row.valid_to === null || row.valid_to > ended)) {
-          row.valid_to = ended;
-          row.updated_at = updatedAt;
-        }
+    if (query.startsWith('update kg_triples set valid_to = ?, updated_at = ? where tenant_id = ? and id = ?')) {
+      const [ended, updatedAt, tenantId, id] = this.values as [string, string, string, string];
+      const row = this.store.kg_triples.find((item) => item.tenant_id === tenantId && item.id === id);
+      if (row) {
+        row.valid_to = ended;
+        row.updated_at = updatedAt;
       }
       return [];
     }
     if (query.startsWith('select id, tenant_id, subject, predicate, object, valid_from, valid_to, confidence, source_drawer_id, source_closet, created_at, updated_at from kg_triples where')) {
       const tenantId = this.values[0] as string;
-      const rows = this.store.kg_triples.filter((row) => row.tenant_id === tenantId);
+      let rows = this.store.kg_triples.filter((row) => row.tenant_id === tenantId);
       if (query.includes('subject = ? and predicate = ? and object = ?')) {
+        const [, subject, predicate, object, asOf] = this.values as [string, string, string, string, string | undefined];
+        rows = rows.filter((row) => row.subject === subject && row.predicate === predicate && row.object === object);
+        if (query.includes('(valid_to is null or valid_to > ?)')) {
+          rows = rows.filter((row) => row.valid_to === null || row.valid_to > String(asOf));
+        }
         return rows as T[];
+      }
+      let nextValueIndex = 1;
+      if (query.includes('(valid_from is null or valid_from <= ?)')) {
+        const asOfStart = this.values[1] as string;
+        const asOfEnd = this.values[2] as string;
+        rows = rows.filter((row) => (row.valid_from === null || row.valid_from <= asOfStart) && (row.valid_to === null || row.valid_to > asOfEnd));
+        nextValueIndex = 3;
+      } else if (query.includes('(valid_to is null or valid_to > ?)')) {
+        const asOf = this.values[1] as string;
+        rows = rows.filter((row) => row.valid_to === null || row.valid_to > asOf);
+        nextValueIndex = 2;
+      }
+      if (query.includes('(subject = ? or object = ?)')) {
+        const entity = this.values[nextValueIndex] as string;
+        rows = rows.filter((row) => row.subject === entity || row.object === entity);
+      } else if (query.includes('subject = ?')) {
+        const entity = this.values[nextValueIndex] as string;
+        rows = rows.filter((row) => row.subject === entity);
+      } else if (query.includes('object = ?')) {
+        const entity = this.values[nextValueIndex] as string;
+        rows = rows.filter((row) => row.object === entity);
       }
       return rows as T[];
     }
@@ -683,11 +804,44 @@ function aggregate<T extends Record<string, unknown>>(rows: T[], key: keyof T) {
   return Array.from(grouped.values()).sort((left, right) => String(left[key as string]).localeCompare(String(right[key as string])));
 }
 
+function filterDiaryEntries(rows: DiaryEntry[], query: string, values: unknown[]): DiaryEntry[] {
+  let valueIndex = 0;
+  const tenantId = values[valueIndex] as string;
+  valueIndex += 1;
+  let filtered = rows.filter((row) => row.tenant_id === tenantId);
+  if (query.includes(' and id = ?')) {
+    const entryId = values[valueIndex] as string;
+    valueIndex += 1;
+    filtered = filtered.filter((row) => row.id === entryId);
+  }
+  if (query.includes('agent_name = ?')) {
+    const agentName = values[valueIndex] as string;
+    valueIndex += 1;
+    filtered = filtered.filter((row) => row.agent_name === agentName);
+  }
+  if (query.includes('wing = ?')) {
+    const wing = values[valueIndex] as string;
+    valueIndex += 1;
+    filtered = filtered.filter((row) => row.wing === wing);
+  }
+  if (query.includes('room = ?')) {
+    const room = values[valueIndex] as string;
+    valueIndex += 1;
+    filtered = filtered.filter((row) => row.room === room);
+  }
+  if (query.includes('topic = ?')) {
+    const topic = values[valueIndex] as string;
+    filtered = filtered.filter((row) => row.topic === topic);
+  }
+  return filtered;
+}
+
 export class FakeD1Database implements D1DatabaseLike {
   readonly store: MemoryStore = {
     drawers: [],
     drawer_chunks: [],
     diary_entries: [],
+    diary_chunks: [],
     kg_entities: [],
     kg_triples: [],
     tunnels: [],

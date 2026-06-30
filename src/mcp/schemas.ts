@@ -36,11 +36,38 @@ const drawerSummaryItemSchema = z.object({
   content_chars: nonNegativeInt,
 });
 
+const wakeContextItemSchema = z.object({
+  drawer_id: z.string(),
+  wing: z.string(),
+  room: z.string(),
+  title: nullableString,
+  source_file: nullableString,
+  text: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  content_chars: nonNegativeInt,
+  truncated: z.boolean(),
+});
+
 const diaryEntrySchema = z.object({
   date: z.string(),
   timestamp: z.string(),
   topic: z.string(),
+  wing: z.string(),
+  room: z.string(),
   content: z.string(),
+});
+
+const diarySearchResultItemSchema = z.object({
+  entry_id: z.string(),
+  agent: z.string(),
+  topic: z.string(),
+  wing: z.string(),
+  room: z.string(),
+  timestamp: z.string(),
+  similarity: z.number(),
+  chunk_index: nonNegativeInt,
+  preview: z.string(),
 });
 
 const kgFactSchema = z.object({
@@ -161,6 +188,14 @@ export const searchSchema = {
   context: z.string().optional(),
 };
 
+export const wakeContextSchema = {
+  mode: z.enum(['global', 'scoped']),
+  wing: z.string().optional(),
+  room: z.string().optional(),
+  max_items: z.coerce.number().int().min(1).max(20).optional(),
+  max_chars: z.coerce.number().int().min(1).max(12000).optional(),
+};
+
 export const duplicateSchema = {
   content: z.string().min(1),
   threshold: z.coerce.number().min(0).max(1).optional(),
@@ -228,6 +263,17 @@ export const kgTimelineSchema = {
   entity: z.string().optional(),
 };
 
+export const kgCheckSchema = {
+  entity: z.string().optional(),
+  predicate: z.string().optional(),
+  as_of: z.string().optional(),
+  older_than_days: z.coerce.number().int().min(1).max(3650).optional(),
+  predicates: z.array(z.string()).optional(),
+  single_valued_predicates: z.array(z.string()).optional(),
+  include_source_checks: z.boolean().optional(),
+  limit: z.coerce.number().int().min(1).max(200).optional(),
+};
+
 export const traverseSchema = {
   start_room: z.string().min(1),
   max_hops: z.coerce.number().int().min(1).max(10).optional(),
@@ -266,12 +312,36 @@ export const diaryWriteSchema = {
   entry: z.string().min(1),
   topic: z.string().optional(),
   wing: z.string().optional(),
+  room: z.string().optional(),
 };
 
 export const diaryReadSchema = {
   agent_name: z.string().min(1),
   last_n: z.coerce.number().int().min(1).max(100).optional(),
   wing: z.string().optional(),
+  room: z.string().optional(),
+};
+
+export const diarySearchSchema = {
+  agent_name: z.string().min(1),
+  query: z.string().min(1).max(250),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  wing: z.string().optional(),
+  room: z.string().optional(),
+  topic: z.string().optional(),
+  max_distance: z.coerce.number().min(0).max(2).optional(),
+  context: z.string().optional(),
+};
+
+export const diaryReindexSchema = {
+  entry_id: z.string().min(1).optional(),
+  agent_name: z.string().min(1).optional(),
+  wing: z.string().optional(),
+  room: z.string().optional(),
+  topic: z.string().optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  offset: z.coerce.number().int().min(0).optional(),
+  dry_run: z.boolean().optional(),
 };
 
 export const hookSettingsSchema = {
@@ -327,6 +397,23 @@ export const getTaxonomyOutputSchema = z.object({
 
 export const getAaakSpecOutputSchema = z.object({
   aaak_spec: z.string(),
+});
+
+export const wakeContextOutputSchema = z.object({
+  mode: z.enum(['global', 'scoped']),
+  scope: z.object({
+    wing: z.string(),
+    room: nullableString,
+  }).nullable(),
+  context_items: z.array(wakeContextItemSchema),
+  instructions: z.array(z.string()),
+  withheld: z.array(z.string()),
+  limits: z.object({
+    max_items: nonNegativeInt,
+    max_chars: nonNegativeInt,
+    returned_items: nonNegativeInt,
+    returned_chars: nonNegativeInt,
+  }),
 });
 
 export const searchOutputSchema = z.object({
@@ -398,6 +485,8 @@ export const diaryWriteOutputSchema = z.object({
   topic: z.string(),
   timestamp: z.string(),
   wing: z.string(),
+  room: z.string(),
+  chunks: nonNegativeInt,
 });
 
 export const diaryReadOutputSchema = z.object({
@@ -406,6 +495,46 @@ export const diaryReadOutputSchema = z.object({
   total: nonNegativeInt,
   showing: nonNegativeInt,
   wing: nullableString,
+  room: nullableString,
+});
+
+export const diarySearchOutputSchema = z.object({
+  query: z.string(),
+  filters: z.object({
+    agent: z.string(),
+    wing: nullableString,
+    room: nullableString,
+    topic: nullableString,
+  }),
+  results: z.array(diarySearchResultItemSchema),
+  context_received: nullableString.optional(),
+});
+
+export const diaryReindexOutputSchema = z.object({
+  success: z.boolean(),
+  dry_run: z.boolean(),
+  scope: z.object({
+    entry_id: nullableString,
+    agent: nullableString,
+    wing: nullableString,
+    room: nullableString,
+    topic: nullableString,
+  }),
+  total: nonNegativeInt,
+  count: nonNegativeInt,
+  reindexed: nonNegativeInt,
+  failed: nonNegativeInt,
+  results: z.array(z.object({
+    entry_id: z.string(),
+    agent: z.string(),
+    topic: z.string(),
+    wing: z.string(),
+    room: z.string(),
+    success: z.boolean(),
+    skipped: z.boolean().optional(),
+    chunks: nonNegativeInt,
+    error: z.string().optional(),
+  })),
 });
 
 export const kgQueryOutputSchema = z.object({
@@ -442,6 +571,51 @@ export const kgTimelineOutputSchema = z.object({
   entity: z.string(),
   timeline: z.array(kgTimelineItemSchema),
   count: nonNegativeInt,
+});
+
+const kgCheckFactSchema = kgFactSchema.extend({
+  triple_id: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+export const kgCheckOutputSchema = z.object({
+  as_of: z.string(),
+  scope: z.object({
+    entity: nullableString,
+    predicate: nullableString,
+  }),
+  summary: z.object({
+    active_conflicts: nonNegativeInt,
+    stale_facts: nonNegativeInt,
+    source_warnings: nonNegativeInt,
+  }),
+  conflicts: z.array(z.object({
+    code: z.string(),
+    severity: z.string(),
+    subject: z.string(),
+    predicate: z.string(),
+    objects: z.array(z.string()),
+    facts: z.array(kgCheckFactSchema),
+    suggested_action: z.string(),
+  })),
+  stale_facts: z.array(z.object({
+    code: z.string(),
+    severity: z.string(),
+    age_days: nonNegativeInt,
+    older_than_days: nonNegativeInt,
+    fact: kgCheckFactSchema,
+    suggested_action: z.string(),
+  })),
+  source_warnings: z.array(z.object({
+    code: z.string(),
+    severity: z.string(),
+    source_drawer_id: nullableString,
+    source_updated_at: z.string().optional(),
+    fact: kgCheckFactSchema,
+    message: z.string(),
+  })),
+  guidance: z.array(z.string()),
 });
 
 export const kgStatsOutputSchema = z.object({

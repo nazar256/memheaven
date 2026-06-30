@@ -30,22 +30,51 @@ describe('mcp auth envelope', async () => {
       result: {
         tools: Array<{
           name: string;
+          description?: string;
           outputSchema?: { type?: string; properties?: Record<string, unknown> };
         }>;
       };
     };
     const statusTool = listed.result.tools.find((tool) => tool.name === 'mempalace_status');
+    const wakeContextTool = listed.result.tools.find((tool) => tool.name === 'mempalace_wake_context');
     const addDrawerTool = listed.result.tools.find((tool) => tool.name === 'mempalace_add_drawer');
+    const aaakTool = listed.result.tools.find((tool) => tool.name === 'mempalace_get_aaak_spec');
+    const diaryWriteTool = listed.result.tools.find((tool) => tool.name === 'mempalace_diary_write');
+    const diarySearchTool = listed.result.tools.find((tool) => tool.name === 'mempalace_diary_search');
+    const diaryReindexTool = listed.result.tools.find((tool) => tool.name === 'mempalace_diary_reindex');
+    const kgCheckTool = listed.result.tools.find((tool) => tool.name === 'mempalace_kg_check');
 
     expect(statusTool).toBeTruthy();
     expect(statusTool?.outputSchema?.type).toBe('object');
     expect(statusTool?.outputSchema?.properties).toHaveProperty('protocol');
     expect(statusTool?.outputSchema?.properties).toHaveProperty('backend');
 
+    expect(wakeContextTool).toBeTruthy();
+    expect(wakeContextTool?.description).toContain('Start here for memory-relevant chats');
+    expect(wakeContextTool?.outputSchema?.type).toBe('object');
+    expect(wakeContextTool?.outputSchema?.properties).toHaveProperty('context_items');
+    expect(wakeContextTool?.outputSchema?.properties).toHaveProperty('withheld');
+
     expect(addDrawerTool).toBeTruthy();
+    expect(addDrawerTool?.description).toContain('concise readable plain text');
+    expect(addDrawerTool?.description).toContain('do not add an AAAK: prefix unless explicitly requested');
     expect(addDrawerTool?.outputSchema?.type).toBe('object');
     expect(addDrawerTool?.outputSchema?.properties).toHaveProperty('drawer_id');
     expect(addDrawerTool?.outputSchema?.properties).toHaveProperty('chunks');
+
+    expect(aaakTool?.description).toContain('compact memory-note guidance');
+    expect(aaakTool?.description).toContain('not literal AAAK-prefixed labels');
+    expect(diaryWriteTool?.description).toContain('concise readable plain-text');
+    expect(diaryWriteTool?.description).toContain('do not add an AAAK: prefix unless explicitly requested');
+    expect(diarySearchTool?.description).toContain('Semantic search over diary entries');
+    expect(diarySearchTool?.description).toContain('one explicit agent');
+    expect(diarySearchTool?.outputSchema?.properties).toHaveProperty('results');
+    expect(diaryReindexTool?.description).toContain('backfill or refresh diary semantic index');
+    expect(diaryReindexTool?.outputSchema?.properties).toHaveProperty('reindexed');
+    expect(kgCheckTool?.description).toContain('deterministic KG reliability checks');
+    expect(kgCheckTool?.outputSchema?.properties).toHaveProperty('conflicts');
+    expect(kgCheckTool?.outputSchema?.properties).toHaveProperty('stale_facts');
+    expect(kgCheckTool?.outputSchema?.properties).toHaveProperty('source_warnings');
   });
 
   it('returns structured content matching advertised schemas for tool calls', async () => {
@@ -84,6 +113,11 @@ describe('mcp auth envelope', async () => {
     expect(body.result.structuredContent).toBeTruthy();
     expect(body.result.structuredContent).toHaveProperty('protocol');
     expect(body.result.structuredContent).toHaveProperty('backend');
+    expect(body.result.structuredContent?.protocol).toContain('Use mempalace_status for diagnostics, protocol text, quotas, and backend capabilities; do not treat status counts as wake-up memory context.');
+    expect(body.result.structuredContent?.aaak_dialect).toContain('concise, readable plain text');
+    expect(body.result.structuredContent?.aaak_dialect).toContain('Do not prefix normal drawer or diary entries with "AAAK:" unless the user explicitly requests that literal format.');
+    expect(body.result.structuredContent?.aaak_dialect).toContain('Do not convert verbatim source content into AAAK');
+    expect(body.result.structuredContent?.protocol).toContain('Write normal drawer and diary entries as concise, readable plain text; do not prefix them with "AAAK:" unless the user explicitly asks for that literal format.');
     expect(body.result.content?.[0]?.text).toContain('protocol');
   });
 

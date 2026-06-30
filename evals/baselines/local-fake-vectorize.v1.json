@@ -1,0 +1,510 @@
+{
+  "fixture_version": "memory-behavior.v1",
+  "runner_version": "per-34-local-eval.v1",
+  "environment": "fake-d1/fake-r2/fake-ai-char-frequency/fake-vectorize-cosine",
+  "summary": {
+    "retrieval_cases": 28,
+    "recall_at_1": 0.714286,
+    "recall_at_3": 0.75,
+    "recall_at_5": 0.75,
+    "mrr": 0.732143,
+    "mean_rank": 1.047619,
+    "duplicate_final_drawer_results": 0,
+    "wrong_scope_results": 0,
+    "wrong_tenant_results": 0,
+    "forbidden_results": 0,
+    "duplicate_cases": 2,
+    "kg_cases": 6,
+    "kg_passed": 6,
+    "hard_failure_count": 0
+  },
+  "retrieval_results": [
+    {
+      "id": "recall-memheaven-r2",
+      "tags": [
+        "semantic"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-project-memheaven-r2-d1",
+        "a-personal-health-cycling",
+        "a-project-luna-decision",
+        "a-research-identifiers",
+        "a-global-preferences-reviewability"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-wake-context-per30",
+      "tags": [
+        "identifier"
+      ],
+      "rank": null,
+      "top_fixture_ids": [
+        "a-research-identifiers",
+        "a-research-vector-bm25",
+        "a-global-preferences-reviewability",
+        "a-project-luna-decision",
+        "a-work-aurora-deploy"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-kg-invalidation-per32",
+      "tags": [
+        "identifier",
+        "kg"
+      ],
+      "rank": null,
+      "top_fixture_ids": [
+        "a-personal-health-cycling",
+        "a-research-vector-bm25",
+        "a-global-preferences-reviewability",
+        "a-personal-travel-kyoto",
+        "a-research-identifiers"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-oauth-pkce",
+      "tags": [
+        "identifier"
+      ],
+      "rank": null,
+      "top_fixture_ids": [
+        "a-research-identifiers",
+        "a-global-preferences-reviewability",
+        "a-research-vector-bm25",
+        "a-work-aurora-deploy",
+        "a-project-luna-decision"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-aaak-guidance",
+      "tags": [
+        "exact_phrase"
+      ],
+      "rank": null,
+      "top_fixture_ids": [
+        "a-research-identifiers",
+        "a-research-vector-bm25",
+        "a-global-preferences-reviewability",
+        "a-project-memheaven-r2-d1",
+        "a-project-memheaven-oauth"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-reviewability-preference",
+      "tags": [
+        "preference"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-global-preferences-reviewability",
+        "a-research-identifiers",
+        "a-project-memheaven-r2-d1",
+        "a-research-vector-bm25",
+        "a-project-memheaven-oauth"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-yurii-profile",
+      "tags": [
+        "profile"
+      ],
+      "rank": null,
+      "top_fixture_ids": [
+        "a-project-memheaven-r2-d1",
+        "a-global-preferences-reviewability",
+        "a-research-vector-bm25",
+        "a-personal-travel-kyoto",
+        "a-work-aurora-deploy"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-aurora-deploy",
+      "tags": [
+        "identifier"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-work-aurora-deploy",
+        "a-work-aurora-db",
+        "a-research-identifiers",
+        "a-research-vector-bm25",
+        "a-personal-travel-kyoto"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-aurora-d1-migration",
+      "tags": [
+        "identifier"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-work-aurora-db",
+        "a-research-identifiers",
+        "a-project-memheaven-r2-d1",
+        "a-research-vector-bm25",
+        "a-global-preferences-reviewability"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-crm-118",
+      "tags": [
+        "identifier"
+      ],
+      "rank": null,
+      "top_fixture_ids": [
+        "a-research-identifiers",
+        "a-project-memheaven-oauth",
+        "a-research-vector-bm25",
+        "a-project-memheaven-r2-d1",
+        "a-global-preferences-reviewability"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-kyoto-ramen",
+      "tags": [
+        "semantic"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-personal-travel-kyoto",
+        "a-research-identifiers",
+        "a-project-memheaven-r2-d1",
+        "a-global-preferences-reviewability",
+        "a-research-vector-bm25"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-cycling-deadlines",
+      "tags": [
+        "preference"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-personal-health-cycling",
+        "a-work-aurora-db",
+        "a-work-aurora-deploy",
+        "a-project-luna-api",
+        "a-research-identifiers"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-bm25-research",
+      "tags": [
+        "retrieval"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-research-vector-bm25",
+        "a-research-identifiers",
+        "a-personal-travel-kyoto",
+        "a-project-memheaven-r2-d1",
+        "a-project-memheaven-oauth"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-kv-token",
+      "tags": [
+        "identifier",
+        "code"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-research-identifiers",
+        "a-global-preferences-reviewability",
+        "a-personal-health-cycling",
+        "a-research-vector-bm25",
+        "a-personal-travel-kyoto"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-luna-api",
+      "tags": [
+        "exact_phrase",
+        "code"
+      ],
+      "rank": null,
+      "top_fixture_ids": [
+        "a-project-luna-decision",
+        "a-research-identifiers",
+        "a-research-vector-bm25",
+        "a-global-preferences-reviewability",
+        "a-project-memheaven-r2-d1"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "recall-luna-decision",
+      "tags": [
+        "decision"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-project-luna-decision",
+        "a-research-identifiers",
+        "a-global-preferences-reviewability",
+        "a-project-memheaven-r2-d1",
+        "a-research-vector-bm25"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "scope-projects-memheaven-per30",
+      "tags": [
+        "scope",
+        "identifier"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-project-memheaven-oauth",
+        "a-project-memheaven-per30",
+        "a-project-memheaven-r2-d1",
+        "a-project-memheaven-aaak",
+        "a-project-memheaven-per32"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "scope-work-aurora",
+      "tags": [
+        "scope"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-work-aurora-db",
+        "a-work-aurora-deploy"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "scope-personal-travel",
+      "tags": [
+        "scope"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-personal-travel-kyoto"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "scope-research-retrieval",
+      "tags": [
+        "scope",
+        "retrieval"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-research-identifiers",
+        "a-research-vector-bm25"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "scope-global-preferences",
+      "tags": [
+        "scope",
+        "preference"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-global-preferences-reviewability"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "scope-project-luna",
+      "tags": [
+        "scope"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-project-luna-decision",
+        "a-project-luna-api"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "scope-work-crm",
+      "tags": [
+        "scope",
+        "identifier"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-work-crm-oauth"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "scope-personal-health",
+      "tags": [
+        "scope",
+        "preference"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "a-personal-health-cycling"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "tenant-a-does-not-see-b-shadow",
+      "tags": [
+        "tenant_isolation"
+      ],
+      "rank": 2,
+      "top_fixture_ids": [
+        "a-research-identifiers",
+        "a-project-memheaven-oauth",
+        "a-project-memheaven-r2-d1",
+        "a-work-aurora-deploy",
+        "a-work-aurora-db"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "tenant-b-kyoto-isolated",
+      "tags": [
+        "tenant_isolation"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "b-personal-travel-kyoto",
+        "b-work-aurora-private",
+        "b-project-memheaven-shadow"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "tenant-b-aurora-isolated",
+      "tags": [
+        "tenant_isolation",
+        "identifier"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "b-work-aurora-private",
+        "b-personal-travel-kyoto",
+        "b-project-memheaven-shadow"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    },
+    {
+      "id": "tenant-b-memheaven-shadow",
+      "tags": [
+        "tenant_isolation",
+        "identifier"
+      ],
+      "rank": 1,
+      "top_fixture_ids": [
+        "b-project-memheaven-shadow",
+        "b-work-aurora-private",
+        "b-personal-travel-kyoto"
+      ],
+      "duplicate_final_drawer_results": 0,
+      "hard_failures": []
+    }
+  ],
+  "duplicate_results": [
+    {
+      "id": "duplicate-exact-same-tenant",
+      "matched_fixture_ids": [
+        "a-project-memheaven-r2-d1"
+      ],
+      "passed": true,
+      "hard_failures": []
+    },
+    {
+      "id": "duplicate-foreign-same-theme-isolated",
+      "matched_fixture_ids": [],
+      "passed": true,
+      "hard_failures": []
+    }
+  ],
+  "kg_results": [
+    {
+      "id": "kg-current-add-query",
+      "scenario": "current_add_query",
+      "passed": true,
+      "hard_failures": []
+    },
+    {
+      "id": "kg-invalidate-current-history",
+      "scenario": "invalidate_current_history",
+      "passed": true,
+      "hard_failures": []
+    },
+    {
+      "id": "kg-open-start-invalidate",
+      "scenario": "open_start_invalidate",
+      "passed": true,
+      "hard_failures": []
+    },
+    {
+      "id": "kg-as-of-history",
+      "scenario": "as_of_history",
+      "passed": true,
+      "hard_failures": []
+    },
+    {
+      "id": "kg-inverted-invalidation-rejected",
+      "scenario": "inverted_invalidation_rejected",
+      "passed": true,
+      "hard_failures": []
+    },
+    {
+      "id": "kg-direction-incoming",
+      "scenario": "direction_incoming",
+      "passed": true,
+      "hard_failures": []
+    }
+  ],
+  "hard_failures": [],
+  "known_limitations": [
+    "Local eval uses deterministic test fakes, including character-frequency embeddings; quality metrics are for branch-to-branch comparison, not product claims.",
+    "Search uses PER-31 hybrid reranking, but local eval still uses fake character-frequency embeddings, so exact identifier scores are baseline observations only.",
+    "PER-33 deterministic KG conflict/staleness checks are unit-tested separately and are not scored in this fixture version."
+  ]
+}

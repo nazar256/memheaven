@@ -18,17 +18,28 @@ MVP for `memheaven`, a Cloudflare-native MemPalace-compatible remote MCP server 
 - Added first-time setup helpers: `npm run init` for Cloudflare resources/config/migrations, `npm run secrets:generate` for valid secret material, and `npm run keygen` for git-ignored tenant key management.
 - Added MIT license and scrubbed public-facing docs/config examples so repository publishing does not expose private operator details.
 - Added MCP `outputSchema` coverage across the exposed tool surface so ChatGPT can understand structured tool results better.
+- Added `mempalace_wake_context` as a privacy-scoped memory startup tool, separate from diagnostic `mempalace_status`, with global curated-context mode and explicit scoped mode.
+- Added deterministic hybrid drawer search reranking with lexical/entity/date boosts, duplicate collapse, and `max_distance` filtering.
+- Clarified compact memory-note guidance so normal drawer and diary entries use concise readable plain text rather than literal `AAAK:` prefixes unless explicitly requested.
+- Hardened KG temporal writes so add and invalidate paths reject inverted intervals before mutation, including date-only start/end semantics and all-or-nothing invalidation preflight.
+- Added read-only KG conflict/staleness checks and scoped semantic search for diary entries.
+- Added a synthetic memory behavior eval harness with local fake-backed fixtures, baseline comparison, and opt-in remote MCP smoke coverage for retrieval, isolation, duplicates, and KG lifecycle behavior.
+- Added manual GitHub Actions remote smoke workflow for configured deployed environments.
 - Added product-facing documentation and metadata: rewritten README first screen, zero-to-self-host guide, client compatibility matrix, security docs, agent memory protocol doc, `server.json`, and a lightweight landing-page scaffold.
-- Restored placeholder `wrangler.toml` values for a publish-safe repo, then promoted ChatGPT back to Confirmed after manual verification of the `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call.
+- Completed hosted-client compatibility and low-effort catalog Linear tasks; MemHeaven is visible in the official MCP Registry, mcpservers.org, mcp.so, and MCP Find.
+- Moved shared Worker defaults to `wrangler.toml.example`; real `wrangler.toml` is local-only and gitignored. ChatGPT was promoted back to Confirmed after manual verification of the `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call.
 - Validated `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npx wrangler deploy --dry-run --outdir .tmp/wrangler-bundle`.
 
 ## Validation snapshot
 
-- `npm test` ✅ (46 tests, including MCP output-schema coverage)
+- `npm test` ✅ (76 tests, including MCP output-schema, wake-context, hybrid search, diary semantic search, KG check, and KG interval-integrity coverage)
 - `npm run typecheck` ✅
 - `npm run lint` ✅
 - `npm run build` ✅
 - `npx wrangler deploy --dry-run --outdir .tmp/wrangler-bundle` ✅
+- `npm run eval:local` ✅ (28 retrieval cases, 2 duplicate cases, 6 KG cases, 0 hard failures)
+- `npm run eval:baseline` ✅
+- `npm run eval:remote` ✅ (skips safely without environment configuration)
 - `npm run init -- --dry-run --base-url https://memory.example.com --skip-migrations` ✅
 - Production smoke on a private workers.dev endpoint ✅
 - Non-interactive end-to-end OAuth `/register` → `/authorize` → `/token` for two fresh tenant keys on the renamed worker ✅
@@ -37,7 +48,7 @@ MVP for `memheaven`, a Cloudflare-native MemPalace-compatible remote MCP server 
 
 - Vectorize indexing is eventually consistent, so semantic search may need a brief retry immediately after a write.
 - Cloudflare Vectorize metadata-index creation may transiently return 504 even when the index creation eventually completes; verify by retrying and checking for `metadata index already exists`.
-- If Vectorize metadata indexes are created after initial ingestion, operators must rerun the provided reindex workflow.
+- If Vectorize metadata indexes or diary semantic search are added after initial ingestion, operators must rerun `npm run init` to ensure metadata indexes and then use `npm run reindex -- --kind drawer|diary|all` for the affected index data.
 
 ## Recommended next steps
 
