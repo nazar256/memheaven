@@ -25,21 +25,26 @@ MVP for `memheaven`, a Cloudflare-native MemPalace-compatible remote MCP server 
 - Added read-only KG conflict/staleness checks and scoped semantic search for diary entries.
 - Added a synthetic memory behavior eval harness with local fake-backed fixtures, baseline comparison, and opt-in remote MCP smoke coverage for retrieval, isolation, duplicates, and KG lifecycle behavior.
 - Added manual GitHub Actions remote smoke workflow for configured deployed environments.
+- Added the Glama inspection artifact: a separate stdio composition root reusing the production MCP core with real sql.js migrations, ephemeral R2/vector adapters, deterministic local embeddings, focused adapter/integration tests, and `Dockerfile.glama`.
+- Added `wrangler.ci.toml` so CI's Worker bundle dry-run has a tracked canonical entrypoint without requiring local resource IDs or credentials; CI also builds and stdio-smoke-tests the Glama image.
 - Added product-facing documentation and metadata: rewritten README first screen, zero-to-self-host guide, client compatibility matrix, security docs, agent memory protocol doc, `server.json`, and a lightweight landing-page scaffold.
 - Completed hosted-client compatibility and low-effort catalog Linear tasks; MemHeaven is visible in the official MCP Registry, mcpservers.org, mcp.so, and MCP Find.
 - Moved shared Worker defaults to `wrangler.toml.example`; real `wrangler.toml` is local-only and gitignored. ChatGPT was promoted back to Confirmed after manual verification of the `/mcp` URL, OAuth authorization flow, and a `mempalace_status` tool call.
-- Validated `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npx wrangler deploy --dry-run --outdir .tmp/wrangler-bundle`.
+- Validated `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`, the CI-configured Wrangler dry-run, the Glama adapter/MCP tests, and local/container stdio smoke.
 
 ## Validation snapshot
 
-- `npm test` ✅ (76 tests, including MCP output-schema, wake-context, hybrid search, diary semantic search, KG check, and KG interval-integrity coverage)
+- `npm test` ✅ (23 files / 90 tests, including Glama adapters and MCP composition)
 - `npm run typecheck` ✅
 - `npm run lint` ✅
 - `npm run build` ✅
 - `npx wrangler deploy --dry-run --outdir .tmp/wrangler-bundle` ✅
 - `npm run eval:local` ✅ (28 retrieval cases, 2 duplicate cases, 6 KG cases, 0 hard failures)
-- `npm run eval:baseline` ✅
+- `npm run eval:baseline` ⚠️ current output has 0 hard failures but differs from the older committed baseline snapshot; no Glama code changes the fake-backed eval path
 - `npm run eval:remote` ✅ (skips safely without environment configuration)
+- `npx wrangler deploy --config wrangler.ci.toml --dry-run --outdir .tmp/wrangler-bundle-final` ✅ (tracked CI entrypoint, no bindings/credentials)
+- `npm run smoke:glama` ✅ (local stdio process; 34 tools)
+- `podman build -f Dockerfile.glama -t memheaven-glama:final .` ✅ and `npm run smoke:glama -- podman localhost/memheaven-glama:final` ✅ (container stdio; 34 tools)
 - `npm run init -- --dry-run --base-url https://memory.example.com --skip-migrations` ✅
 - Production smoke on a private workers.dev endpoint ✅
 - Non-interactive end-to-end OAuth `/register` → `/authorize` → `/token` for two fresh tenant keys on the renamed worker ✅
@@ -49,6 +54,7 @@ MVP for `memheaven`, a Cloudflare-native MemPalace-compatible remote MCP server 
 - Vectorize indexing is eventually consistent, so semantic search may need a brief retry immediately after a write.
 - Cloudflare Vectorize metadata-index creation may transiently return 504 even when the index creation eventually completes; verify by retrying and checking for `metadata index already exists`.
 - If Vectorize metadata indexes or diary semantic search are added after initial ingestion, operators must rerun `npm run init` to ensure metadata indexes and then use `npm run reindex -- --kind drawer|diary|all` for the affected index data.
+- The Glama image is an ephemeral inspection artifact, not a replacement for Cloudflare production. The first Glama Deploy may still require maintainer-only build-spec tuning after the artifact is claimed.
 
 ## Recommended next steps
 

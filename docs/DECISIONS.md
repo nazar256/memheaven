@@ -89,3 +89,11 @@
 - Decision: Memheaven MCP tools define `outputSchema` for stable success responses and return matching `structuredContent` on successful tool calls.
 - Why: ChatGPT and other MCP clients surface a recommendation when tools omit output schemas, and providing them materially improves tool discoverability and result understanding from `tools/list` metadata.
 - Tradeoff: Error paths still use `isError: true` rather than forcing failures into a success schema; this matches the MCP SDK guidance and avoids misleading schemas for unsupported/error states.
+
+## D-013: Glama uses an isolated inspection composition root
+
+- Status: Accepted
+- Date: 2026-08-11
+- Decision: Keep Cloudflare Worker + D1/R2/Workers AI/Vectorize as the canonical production runtime, and add `glama/` plus `Dockerfile.glama` for stdio inspection using sql.js migrations, ephemeral in-memory content/vector adapters, deterministic local embeddings, and a fixed non-production auth context.
+- Why: Glama needs a credential-free, network-independent MCP process for build/introspection/quality checks, while the real tool handlers and business behavior must remain shared with production.
+- Tradeoff: Local embeddings and ephemeral storage are compatibility infrastructure, not production-equivalent semantic quality or persistence; the Glama status capability metadata reports that limitation.

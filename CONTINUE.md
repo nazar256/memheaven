@@ -20,6 +20,8 @@ Public product docs should treat `docs/PROJECT_STATE.md` and `README.md` as the 
 - Linear project `MemHeaven` had no remaining `Backlog`, `Todo`, `In Progress`, or `In Review` issues after the 2026-06-30 task-delivery pass.
 - Catalog status as of 2026-06-30: official MCP Registry, mcpservers.org, mcp.so, and MCP Find list MemHeaven; punkpeye/awesome-mcp-servers PR #6361 remains open; MCP Market was not found; Glama was ambiguous from direct public scans despite the PR `has-glama` label.
 - `.github/workflows/remote-smoke.yml` provides a manual remote smoke workflow. It uses `MEMHEAVEN_EVAL_BASE_URL`, `MEMHEAVEN_EVAL_BEARER_TOKEN`, and optional `MEMHEAVEN_EVAL_BEARER_TOKEN_B` GitHub secrets.
+- `Dockerfile.glama` is an inspection-only stdio artifact: it reuses `createMcpServer` with sql.js migrations, in-memory content/vector stores, and deterministic local embeddings. Run `npm run smoke:glama` for the local process or `npm run smoke:glama -- docker memheaven-glama:smoke` after building the image.
+- CI uses tracked `wrangler.ci.toml` for the Worker dry-run because the local `wrangler.toml` is intentionally gitignored; the CI config has the canonical `src/index.ts` entrypoint but no resource IDs or secrets.
 
 ## Open follow-ups
 

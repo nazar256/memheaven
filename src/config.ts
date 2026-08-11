@@ -294,10 +294,13 @@ export function getConfigDiagnostics(env: AppEnv): ConfigDiagnostics {
       csrfCookieName: 'memheaven_csrf',
       supportedScopes: ['memory.read', 'memory.write'],
       backendCapabilities: {
+        deployment: 'cloudflare-worker',
+        content_store: 'R2 durable content store',
         vector_backend: 'Vectorize',
         embedding_model: envResult.data.EMBEDDING_MODEL,
         embedding_dimensions: envResult.data.EMBEDDING_DIMENSIONS,
         chunking_enabled: true,
+        ephemeral: false,
         plan_mode: envResult.data.PLAN_MODE as PlanMode,
         limits: {
           search_default_limit: envResult.data.SEARCH_DEFAULT_LIMIT,

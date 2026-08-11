@@ -18,4 +18,6 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
-      - run: npx wrangler deploy --dry-run --outdir .tmp/wrangler-bundle
+      - run: npx wrangler deploy --config wrangler.ci.toml --dry-run --outdir .tmp/wrangler-bundle
+      - run: docker build -f Dockerfile.glama -t memheaven-glama:ci .
+      - run: npm run smoke:glama -- docker memheaven-glama:ci

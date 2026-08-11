@@ -28,6 +28,10 @@
 - [x] TEST-030 Add quota and validation command coverage, smoke scripts, and local helper scripts
 - [x] DOC-030 Finalize README deployment guide, decisions log, AGENTS pointers, project state, and continuation handoff
 - [x] QA-010 Run tests, typecheck, build, deploy dry-run, review readiness, and update `CONTINUE.md`
+- [x] GLAMA-010 Add isolated stdio composition root with fixed inspection auth and truthful local backend capability reporting
+- [x] GLAMA-020 Implement sql.js D1 migrations/transactions, memory R2, deterministic embeddings, and brute-force vector adapters
+- [x] GLAMA-030 Add adapter/MCP integration tests, Docker artifact, container stdio smoke, and Glama inspection documentation
+- [x] GLAMA-040 Repair CI Worker dry-run with tracked credential-free Wrangler configuration and keep Docker smoke in CI
 
 ## Reconciled follow-up candidates
 

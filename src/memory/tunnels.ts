@@ -301,19 +301,24 @@ export async function graphStats(env: AppEnv, _config: AppConfig, auth: TenantAu
   };
 }
 
-export async function localToolStatus(env: AppEnv, _config: AppConfig, auth: TenantAuthContext) {
+export async function localToolStatus(env: AppEnv, config: AppConfig, auth: TenantAuthContext) {
   const db = requireBinding(env.DB, 'DB');
   const latestWrite = await queryFirst<{ count: number; latest: string | null }>(
     db,
     `select count(*) as count, max(created_at) as latest from write_audit_log where tenant_id = ?`,
     [auth.tenantId],
   );
+  const ephemeral = config.backendCapabilities.ephemeral;
   return {
     status: latestWrite?.count ? 'ok' : 'quiet',
-    message: latestWrite?.count ? 'Recent memory writes were filed away in Cloudflare storage.' : 'No recent memory writes are recorded for this tenant yet.',
+    message: latestWrite?.count
+      ? `Recent memory writes were filed away in the ${config.backendCapabilities.content_store}.`
+      : 'No recent memory writes are recorded for this tenant yet.',
     count: latestWrite?.count ?? 0,
     timestamp: latestWrite?.latest,
-    cloud_mode: true,
-    note: 'Local hook checkpoint files do not exist in the Cloudflare deployment.',
+    cloud_mode: !ephemeral,
+    note: ephemeral
+      ? `${config.backendCapabilities.deployment} storage is ephemeral and does not expose local hook checkpoint files.`
+      : 'Local hook checkpoint files do not exist in the hosted deployment.',
   };
 }

@@ -1,0 +1,7 @@
+# CI-only bundle configuration. It deliberately has no Cloudflare resource
+# identifiers or secrets; the tracked local/deployment template remains
+# wrangler.toml.example.
+name = "memheaven-ci"
+main = "src/index.ts"
+compatibility_date = "2026-05-13"
+workers_dev = false

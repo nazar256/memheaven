@@ -181,7 +181,7 @@ async function reindexDiaryEntry(
   const bucket = requireBinding(env.MEMORY_BUCKET, 'MEMORY_BUCKET');
   const content = await getText(bucket, entry.r2_key);
   if (content === null) {
-    throw new Error('diary body is missing from R2');
+    throw new Error('diary body is missing from the configured content store');
   }
 
   const contentHash = await sha256Hex(content);
