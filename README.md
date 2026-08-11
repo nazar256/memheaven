@@ -183,7 +183,7 @@ See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md). These are MemHeaven self-evals w
 | POST | `/token` | Authorization-code and refresh-token exchange |
 | GET / POST / DELETE | `/mcp` | Authenticated Streamable HTTP MCP endpoint |
 
-## Tool surface summary
+## Tools
 
 Implemented MemPalace-compatible tools include:
 
