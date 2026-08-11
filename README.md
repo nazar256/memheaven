@@ -127,6 +127,25 @@ We see that as complementary to MemPalace’s on-device approach, not a replacem
 - Vectorize performs semantic search over chunked memory content.
 - Access keys gate authorization and map users to tenant-scoped memory.
 
+## Glama inspection artifact
+
+Cloudflare remains MemHeaven's canonical production architecture. `Dockerfile.glama`
+is a compatibility artifact for Glama build, introspection, and quality checks;
+it starts the same MCP handlers over stdio with ephemeral `sql.js`, in-memory
+content/vector stores, and deterministic local embeddings. It needs no
+Cloudflare credentials or runtime network access and is not a general-purpose
+self-hosting replacement.
+
+To exercise the artifact locally (Docker or a compatible container runtime):
+
+```bash
+docker build -f Dockerfile.glama -t memheaven-glama:smoke .
+npm run smoke:glama -- docker memheaven-glama:smoke
+```
+
+The smoke command verifies MCP initialization, the complete production tool
+set, and `mempalace_status` over the container's stdio protocol.
+
 ## Documentation
 
 - [`docs/GETTING_STARTED_FROM_ZERO.md`](docs/GETTING_STARTED_FROM_ZERO.md)

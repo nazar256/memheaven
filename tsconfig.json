@@ -19,6 +19,7 @@
   },
   "include": [
     "src/**/*.ts",
+    "glama/**/*.ts",
     "scripts/**/*.ts",
     "tests/**/*.ts",
     "vitest.config.ts",

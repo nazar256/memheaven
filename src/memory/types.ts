@@ -196,10 +196,13 @@ export interface BindingStatus {
 }
 
 export interface BackendCapabilities {
+  deployment: string;
+  content_store: string;
   vector_backend: string;
   embedding_model: string;
   embedding_dimensions: number;
   chunking_enabled: boolean;
+  ephemeral: boolean;
   plan_mode: PlanMode;
   limits: {
     search_default_limit: number;

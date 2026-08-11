@@ -43,6 +43,9 @@
     "keygen": "tsx scripts/generate-access-key.ts",
     "smoke:oauth": "tsx scripts/smoke-oauth.ts",
     "smoke:mcp": "tsx scripts/smoke-mcp.ts",
+    "glama": "tsx glama/server.ts",
+    "test:glama": "vitest run tests/glama.adapters.test.ts tests/glama.integration.test.ts",
+    "smoke:glama": "tsx scripts/smoke-glama.ts",
     "reindex": "tsx scripts/reindex.ts",
     "eval:local": "tsx scripts/eval-local.ts",
     "eval:baseline": "tsx scripts/eval-local.ts --compare-baseline evals/baselines/local-fake-vectorize.v1.json",
@@ -52,6 +55,7 @@
     "@cfworker/json-schema": "^4.1.1",
     "@modelcontextprotocol/sdk": "1.29.0",
     "jose": "6.1.0",
+    "sql.js": "^1.13.0",
     "zod": "^3.25.0"
   },
   "devDependencies": {
@@ -60,7 +64,6 @@
     "@eslint/js": "^9.27.0",
     "eslint": "^9.27.0",
     "globals": "^15.15.0",
-    "sql.js": "^1.13.0",
     "tsx": "^4.19.4",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.32.0",

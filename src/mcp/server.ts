@@ -12,7 +12,7 @@ export function createMcpServer(env: AppEnv, config: AppConfig, auth: TenantAuth
       name: 'memheaven',
       title: 'MemHeaven',
       version: '0.1.0',
-      description: 'Cloudflare-native MemPalace-compatible remote MCP server.',
+      description: 'MemPalace-compatible memory MCP server with deployment-specific storage and search backends.',
     },
     {
       capabilities: {
