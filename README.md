@@ -185,15 +185,59 @@ See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md). These are MemHeaven self-evals w
 
 ## Tools
 
-Implemented MemPalace-compatible tools include:
+Implemented MemPalace-compatible tools are grouped by domain below. Each tool is listed individually so directory indexes can extract its name and description.
 
-- Palace read tools: `mempalace_status`, `mempalace_wake_context`, `mempalace_list_wings`, `mempalace_list_rooms`, `mempalace_get_taxonomy`, `mempalace_get_aaak_spec`, `mempalace_search`, `mempalace_check_duplicate`, `mempalace_get_drawer`, `mempalace_list_drawers`
-- Palace write tools: `mempalace_add_drawer`, `mempalace_update_drawer`, `mempalace_delete_drawer`
-- Diary tools: `mempalace_diary_write`, `mempalace_diary_read`, `mempalace_diary_search`, `mempalace_diary_reindex`
-- Knowledge graph tools: `mempalace_kg_query`, `mempalace_kg_check`, `mempalace_kg_add`, `mempalace_kg_invalidate`, `mempalace_kg_timeline`, `mempalace_kg_stats`
-- Navigation/graph tools: `mempalace_traverse`, `mempalace_find_tunnels`, `mempalace_graph_stats`, `mempalace_create_tunnel`, `mempalace_list_tunnels`, `mempalace_delete_tunnel`, `mempalace_follow_tunnels`
-- Local-only adaptations: `mempalace_hook_settings`, `mempalace_memories_filed_away`, `mempalace_reconnect`
-- Explicitly unsupported in hosted mode: `mempalace_sync`
+**Palace read tools**
+
+- `mempalace_status` — Diagnostics and backend capabilities for memory-relevant chats.
+- `mempalace_wake_context` — Start a memory-relevant chat with bounded, privacy-scoped startup context.
+- `mempalace_list_wings` — List tenant-scoped wings and active drawer counts.
+- `mempalace_list_rooms` — List tenant-scoped rooms and active drawer counts for one wing or all wings.
+- `mempalace_get_taxonomy` — Return the current tenant-scoped wing and room taxonomy.
+- `mempalace_get_aaak_spec` — Return compact guidance for concise, readable memory notes.
+- `mempalace_search` — Search tenant-scoped drawers with hybrid semantic and lexical retrieval.
+- `mempalace_check_duplicate` — Check for exact or semantic duplicates before writing memory.
+- `mempalace_get_drawer` — Fetch one tenant-scoped drawer with bounded content and provenance.
+- `mempalace_list_drawers` — List active tenant-scoped drawers with optional wing and room filters.
+
+**Palace write tools**
+
+- `mempalace_add_drawer` — Add durable drawer content and index it semantically.
+- `mempalace_update_drawer` — Update a drawer and reindex changed content or metadata.
+- `mempalace_delete_drawer` — Soft-delete a tenant-scoped drawer and remove its semantic index entries.
+
+**Diary tools**
+
+- `mempalace_diary_write` — Write a concise diary entry and index it for scoped search.
+- `mempalace_diary_read` — Read recent diary entries with optional wing and room filters.
+- `mempalace_diary_search` — Search diary entries for one explicit agent with hard scope filters.
+- `mempalace_diary_reindex` — Backfill or refresh diary semantic index rows for the tenant.
+
+**Knowledge graph tools**
+
+- `mempalace_kg_query` — Query tenant-scoped temporal knowledge-graph facts.
+- `mempalace_kg_check` — Run deterministic reliability checks for active KG conflicts and stale facts.
+- `mempalace_kg_add` — Add a tenant-scoped temporal knowledge-graph fact.
+- `mempalace_kg_invalidate` — Invalidate an exact tenant-scoped knowledge-graph fact.
+- `mempalace_kg_timeline` — Show the recent knowledge-graph timeline for an entity or all facts.
+- `mempalace_kg_stats` — Return tenant-scoped knowledge-graph statistics.
+
+**Navigation and graph tools**
+
+- `mempalace_traverse` — Traverse the tenant shared-room graph and explicit tunnels.
+- `mempalace_find_tunnels` — Find tenant-scoped cross-wing shared rooms that behave like passive tunnels.
+- `mempalace_graph_stats` — Return tenant-scoped graph, shared-room, and explicit tunnel statistics.
+- `mempalace_create_tunnel` — Create an explicit tenant-scoped tunnel between wing and room locations.
+- `mempalace_list_tunnels` — List tenant-scoped explicit tunnels, optionally filtered by endpoint wing.
+- `mempalace_delete_tunnel` — Delete a tenant-scoped explicit tunnel by ID.
+- `mempalace_follow_tunnels` — Follow explicit tunnels connected to a wing and room location.
+
+**Deployment adaptations**
+
+- `mempalace_hook_settings` — Return the configured save policy for this deployment.
+- `mempalace_memories_filed_away` — Return the latest tenant-scoped write filing status.
+- `mempalace_reconnect` — Return configured binding and index health.
+- `mempalace_sync` — Report that local filesystem and git sync is unsupported in hosted mode.
 
 This MVP intentionally omits generic `search` / `fetch` aliases to avoid duplicating the primary MemPalace surface unless connector UX proves they are needed later.
 
