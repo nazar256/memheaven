@@ -31,6 +31,9 @@ describe('static landing-page discovery metadata', () => {
     expect((html.match(/<link rel="canonical"\s/gi) ?? []).length).toBe(1);
     expect(html).toContain(`<link rel="canonical" href="${canonicalUrl}" />`);
     expect(metaContent(html, 'name', 'description')).toBe(description);
+    expect(metaContent(html, 'name', 'google-site-verification')).toBe(
+      '84_pyvmKnBGTeXubRi88EMmlgFPk7bUqRznCbj5jZ_U',
+    );
     expect(metaContent(html, 'property', 'og:type')).toBe('website');
     expect(metaContent(html, 'property', 'og:url')).toBe(canonicalUrl);
     expect(metaContent(html, 'property', 'og:title')).toBe(
