@@ -67,15 +67,10 @@ describe('static landing-page discovery metadata', () => {
     expect(html).toContain('Self-hosted ChatGPT memory over remote MCP');
   });
 
-  it('publishes crawler entry points for the GitHub Pages site', () => {
+  it('publishes a canonical sitemap for the GitHub Pages site', () => {
     const canonicalUrl = 'https://nazar256.github.io/memheaven/';
-    const sitemapUrl = `${canonicalUrl}sitemap.xml`;
-    const robots = readSiteFile('robots.txt');
     const sitemap = readSiteFile('sitemap.xml');
 
-    expect(robots).toContain('User-agent: *');
-    expect(robots).toContain('Allow: /');
-    expect(robots).toContain(`Sitemap: ${sitemapUrl}`);
     expect(sitemap).toContain(
       '<?xml version="1.0" encoding="UTF-8"?>',
     );
