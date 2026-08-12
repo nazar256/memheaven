@@ -25,6 +25,10 @@ MemHeaven is for people who want:
 - continuity for coding agents and other AI workflows across sessions
 - a remote MCP deployment shape instead of a laptop-only setup
 
+## ChatGPT long-term memory over remote MCP
+
+If you want ChatGPT to use a searchable memory layer across chats without putting that memory in a shared third-party service, deploy MemHeaven in your own Cloudflare account and connect ChatGPT to your instance's `/mcp` endpoint. This external memory complements ChatGPT's built-in memory: you can inspect, search, and delete the records stored by your own deployment. See the [ChatGPT setup](#chatgpt-setup) and [security model](docs/SECURITY.md) before connecting a client.
+
 ## Why MemHeaven exists
 
 - AI assistants forget project context across chats and sessions.

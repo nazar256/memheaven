@@ -182,6 +182,25 @@
       </section>
 
       <section>
+        <h2>ChatGPT long-term memory, under your control</h2>
+        <div class="grid">
+          <div class="card">
+            <strong>How does this give ChatGPT durable memory?</strong>
+            <p>Connect ChatGPT to your own MemHeaven <code>/mcp</code> endpoint. ChatGPT can then use its memory tools for searchable context that persists across chats and sessions.</p>
+          </div>
+          <div class="card">
+            <strong>Is this ChatGPT's built-in memory?</strong>
+            <p>No. MemHeaven is a separate, inspectable memory layer that you deploy and control. It complements ChatGPT's built-in memory rather than replacing or changing it.</p>
+          </div>
+          <div class="card">
+            <strong>What does self-hosted mean here?</strong>
+            <p>You deploy the Worker and its storage bindings in your own Cloudflare account. There is no shared public MemHeaven instance; free-tier limits and service constraints still apply.</p>
+          </div>
+        </div>
+        <p><a class="link" href="https://github.com/nazar256/memheaven#chatgpt-setup">Follow the ChatGPT setup guide →</a></p>
+      </section>
+
+      <section>
         <h2>How it works</h2>
         <ul>
           <li>Cloudflare Worker exposes OAuth endpoints and the remote <code>/mcp</code> endpoint.</li>
