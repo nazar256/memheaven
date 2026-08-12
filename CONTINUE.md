@@ -23,8 +23,17 @@ Public product docs should treat `docs/PROJECT_STATE.md` and `README.md` as the 
 - `Dockerfile.glama` is an inspection-only stdio artifact: it reuses `createMcpServer` with sql.js migrations, in-memory content/vector stores, and deterministic local embeddings. Run `npm run smoke:glama` for the local process or `npm run smoke:glama -- docker memheaven-glama:smoke` after building the image.
 - CI uses tracked `wrangler.ci.toml` for the Worker dry-run because the local `wrangler.toml` is intentionally gitignored; the CI config has the canonical `src/index.ts` entrypoint but no resource IDs or secrets.
 
+## Discoverability campaign checkpoint — 2026-08-12
+
+- The campaign remains `ACTIVE`; the fixed unauthenticated ten-query baseline is `0/10`. Do not call that failure or `EXHAUSTED` before the recorded 24-hour, 72-hour, and 7-day checks.
+- PR #6 (`https://github.com/nazar256/memheaven/pull/6`) merged as `dbea72b9c758dfebef94b72f90ef68f18de60011`; CI and Pages succeeded, and the live site exposes the ChatGPT long-term-memory section, metadata, verification artifact, and sitemap.
+- Discovery is confirmed on the Official MCP Registry, mcpservers.org, mcp.so, and Glama. mcp.so’s public listing is accurate, but its internal `memheaven` search is stale while known searches work; the no-cost support ticket requires an authenticated account, and paid submission is out of scope.
+- TensorBlock’s index had no duplicate; factual intake issue #1703 is open at `https://github.com/TensorBlock/awesome-mcp-servers/issues/1703`. Upstream awesome-mcp-servers PR #11926 remains open and maintainer-controlled.
+- Search Console remains a separate HUMAN_BLOCKED workstream. Durable campaign evidence and exact next checks are in `.tmp/campaign/memheaven-discoverability-state.md` and `.tmp/plans/memheaven-discoverability-campaign.md`.
+
 ## Open follow-ups
 
 1. Rotate/remove any temporary smoke-test keys from the deployed Worker secret if configured deployment access is available.
 2. Verify Claude hosted connector flow before upgrading it beyond Expected in docs.
 3. Verify VS Code / Copilot hosted OAuth before adding any exact non-loopback callback.
+4. Continue the discoverability campaign at the recorded 24-hour, 72-hour, and 7-day checkpoints; do not change the fixed query set or create duplicate catalog listings.
