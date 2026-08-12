@@ -68,6 +68,10 @@ describe('static landing-page discovery metadata', () => {
       keywords: ['ChatGPT memory', 'self-hosted memory', 'remote MCP memory', 'AI agent memory'],
     });
     expect(html).toContain('Self-hosted ChatGPT memory over remote MCP');
+    expect(html).toContain('<h2>ChatGPT long-term memory, under your control</h2>');
+    expect(html).toContain('How does this give ChatGPT durable memory?');
+    expect(html).toContain("MemHeaven is a separate, inspectable memory layer that you deploy and control.");
+    expect(html).toContain('https://github.com/nazar256/memheaven#chatgpt-setup');
   });
 
   it('publishes a canonical sitemap for the GitHub Pages site', () => {
