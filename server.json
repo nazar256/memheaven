@@ -9,7 +9,7 @@
     }
   ],
   "description": "Self-hosted remote MCP memory server for ChatGPT and AI agents.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": {
     "url": "https://github.com/nazar256/memheaven",
     "source": "github"
