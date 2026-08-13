@@ -1,0 +1,570 @@
+{
+  "measured_at": "2026-08-12T16:05:05.015Z",
+  "surface": "web__run search_query",
+  "response_length": "short",
+  "locale": "not exposed by tool",
+  "authenticated": false,
+  "notes": "Ordered result metadata below is the reproducibility manifest for the campaign baseline. Search engines may vary by time, region, and ranking state; reuse the same tool and query strings for delayed checks.",
+  "queries": [
+    {
+      "query": "ChatGPT long term memory server",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "Dreaming: Better memory for a more helpful ChatGPT | OpenAI",
+          "url": "https://openai.com/index/chatgpt-memory-dreaming/"
+        },
+        {
+          "rank": 2,
+          "title": "Memory and new controls for ChatGPT | OpenAI",
+          "url": "https://openai.com/index/memory-and-new-controls-for-chatgpt/"
+        },
+        {
+          "rank": 3,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq?authuser=0"
+        },
+        {
+          "rank": 4,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq%25252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525253F.pict"
+        },
+        {
+          "rank": 5,
+          "title": "Your Year with ChatGPT - FAQs | OpenAI Help Center",
+          "url": "https://help-lb.openai.com/en/articles/20001042-your-year-with-chatgpt-faqs"
+        },
+        {
+          "rank": 6,
+          "title": "Persistent Memory for AI Agents | Long-Term LLM Memory Platform — PersistMemory",
+          "url": "https://persistmemory.com/"
+        },
+        {
+          "rank": 7,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq%252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525253F.webm"
+        },
+        {
+          "rank": 8,
+          "title": "Une base plus solide pour la mémoire de ChatGPT | OpenAI",
+          "url": "https://openai.com/fr-FR/index/chatgpt-memory-dreaming/"
+        },
+        {
+          "rank": 9,
+          "title": "Eine stärkere Grundlage für die Erinnerung in ChatGPT | OpenAI",
+          "url": "https://openai.com/de-DE/index/chatgpt-memory-dreaming/"
+        },
+        {
+          "rank": 10,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq%3F.pdf"
+        }
+      ]
+    },
+    {
+      "query": "self-hosted ChatGPT memory",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "Memory and new controls for ChatGPT | OpenAI",
+          "url": "https://openai.com/index/memory-and-new-controls-for-chatgpt/"
+        },
+        {
+          "rank": 2,
+          "title": "Dreaming: Better memory for a more helpful ChatGPT | OpenAI",
+          "url": "https://openai.com/index/chatgpt-memory-dreaming/"
+        },
+        {
+          "rank": 3,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq?_bhlid=454817254a0c2cc7861df8d59a6241ab3b5b257f"
+        },
+        {
+          "rank": 4,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq%25252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525253F.pict"
+        },
+        {
+          "rank": 5,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq%3F.pdf"
+        },
+        {
+          "rank": 6,
+          "title": "Memlord — Self-hosted MCP Memory Server",
+          "url": "https://memlord.com/"
+        },
+        {
+          "rank": 7,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq.pls"
+        },
+        {
+          "rank": 8,
+          "title": "mnemory · PyPI",
+          "url": "https://pypi.org/project/mnemory/"
+        },
+        {
+          "rank": 9,
+          "title": "ChatGPT Memory — Complete Guide (2026) · TokRepo",
+          "url": "https://tokrepo.com/en/ai-memory/chatgpt-memory-guide"
+        },
+        {
+          "rank": 10,
+          "title": "Projects in ChatGPT | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/10169521-projects-in-chatgpt?_bhlid=2ccb406afcc658dd9746ce6a0d4da08e997e9f91"
+        }
+      ]
+    },
+    {
+      "query": "persistent memory for ChatGPT",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "Experts find AI agents can be tricked into 'remembering' fake facts for months - so how do we stop it?",
+          "url": "https://www.techradar.com/pro/security/experts-find-ai-agents-can-be-tricked-into-remembering-fake-facts-for-months-so-how-do-we-stop-it"
+        },
+        {
+          "rank": 2,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq?authuser=0"
+        },
+        {
+          "rank": 3,
+          "title": "Dreaming: Better memory for a more helpful ChatGPT | OpenAI",
+          "url": "https://openai.com/index/chatgpt-memory-dreaming/"
+        },
+        {
+          "rank": 4,
+          "title": "Memory and new controls for ChatGPT | OpenAI",
+          "url": "https://openai.com/index/memory-and-new-controls-for-chatgpt/"
+        },
+        {
+          "rank": 5,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq%252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525253F.webm"
+        },
+        {
+          "rank": 6,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq%3F.pdf"
+        },
+        {
+          "rank": 7,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq%25252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525252525253F.pict"
+        },
+        {
+          "rank": 8,
+          "title": "ChatGPT Memory Power-User Guide: 5-Category System | UD",
+          "url": "https://www.ud.hk/en/blogs/insight/article/2026-05-01-chatgpt-memory-power-user-guide"
+        },
+        {
+          "rank": 9,
+          "title": "Memori: A Persistent Memory Layer for Efficient, Context-Aware LLM Agents",
+          "url": "https://arxiv.org/abs/2603.19935"
+        },
+        {
+          "rank": 10,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help.openai.com/en/articles/8590148-memory-faq.pls"
+        }
+      ]
+    },
+    {
+      "query": "MCP memory server",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "memcp-server · PyPI",
+          "url": "https://pypi.org/project/memcp-server/"
+        },
+        {
+          "rank": 2,
+          "title": "Official MCP Registry",
+          "url": "https://registry.modelcontextprotocol.io/?q=io.github.mnemoverse%2Fmcp-memory-server"
+        },
+        {
+          "rank": 3,
+          "title": "MCP Server Architecture Patterns for LLM-Integrated Applications",
+          "url": "https://arxiv.org/abs/2606.30317"
+        },
+        {
+          "rank": 4,
+          "title": "Example Servers - Model Context Protocol",
+          "url": "https://modelcontextprotocol.io/examples"
+        },
+        {
+          "rank": 5,
+          "title": "Remote MCP Memory Server",
+          "url": "https://memory.mcpgenerator.com/"
+        },
+        {
+          "rank": 6,
+          "title": "@provos/memory-mcp-server - npm",
+          "url": "https://www.npmjs.com/package/%40provos/memory-mcp-server"
+        },
+        {
+          "rank": 7,
+          "title": "MCP Memory Servers: Giving Your AI Agents Long-Term Memory | MCP Servers",
+          "url": "https://blog.mcpservers.org/posts/mcp-memory-servers"
+        },
+        {
+          "rank": 8,
+          "title": "Memory (npx) MCP Server - Install & Configure | Model Context Protocol | McpMux - MCP Server Registry",
+          "url": "https://mcpmux.com/servers/community.memory-npx/"
+        },
+        {
+          "rank": 9,
+          "title": "Attested Tool-Server Admission: A Security Extension to the Model Context Protocol",
+          "url": "https://arxiv.org/abs/2605.24248"
+        },
+        {
+          "rank": 10,
+          "title": "MCP Server | Memories",
+          "url": "https://memories.sh/docs/integrations/mcp"
+        }
+      ]
+    },
+    {
+      "query": "self-hosted MCP memory",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "Memlord — Self-hosted MCP Memory Server",
+          "url": "https://memlord.com/"
+        },
+        {
+          "rank": 2,
+          "title": "Glyph Hold - Self-Hosted AI Agent Memory for Hermes, Codex and MCP",
+          "url": "https://glyphhold.com/"
+        },
+        {
+          "rank": 3,
+          "title": "Remote MCP Memory Server",
+          "url": "https://memory.mcpgenerator.com/"
+        },
+        {
+          "rank": 4,
+          "title": "GitHub - elvismdev/mem0-mcp-selfhosted: Self-hosted mem0 MCP server for Claude Code. Run a complete memory server against self-hosted Qdrant + Neo4j + Ollama while using Claude as the main LLM. · GitHub",
+          "url": "https://github.com/elvismdev/mem0-mcp-selfhosted"
+        },
+        {
+          "rank": 5,
+          "title": "MemDB — Self-Hosted AI Memory · 72.5% LoCoMo — MemDB",
+          "url": "https://memdb.ai/"
+        },
+        {
+          "rank": 6,
+          "title": "Palace | Self-Hosted Memory for AI Coding Agents (Cursor, Claude Code, Codex)",
+          "url": "https://palacememory.com/"
+        },
+        {
+          "rank": 7,
+          "title": "OmniMem — Persistent AI Memory for Coding Agents | Self-Hosted MCP Server",
+          "url": "https://omnimem.org/"
+        },
+        {
+          "rank": 8,
+          "title": "GitHub - doobidoo/mcp-memory-service: Open-source persistent memory for AI agent pipelines (LangGraph, CrewAI, AutoGen) and Claude. REST API + knowledge graph + autonomous consolidation. · GitHub",
+          "url": "https://github.com/doobidoo/mcp-memory-service"
+        },
+        {
+          "rank": 9,
+          "title": "mcp-memory-service · PyPI",
+          "url": "https://pypi.org/project/mcp-memory-service/"
+        },
+        {
+          "rank": 10,
+          "title": "Self-Hosted vs Hosted MCP Memory: How to Choose | Hjarni",
+          "url": "https://hjarni.com/self-hosted-vs-hosted-mcp-memory"
+        }
+      ]
+    },
+    {
+      "query": "memory for AI agents",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "Experts find AI agents can be tricked into 'remembering' fake facts for months - so how do we stop it?",
+          "url": "https://www.techradar.com/pro/security/experts-find-ai-agents-can-be-tricked-into-remembering-fake-facts-for-months-so-how-do-we-stop-it"
+        },
+        {
+          "rank": 2,
+          "title": "Trust your AI agents? New research shows 'memory poisoning' can dupe them into 'remembering' fake information - and it's a huge security risk",
+          "url": "https://www.itpro.com/security/trust-your-ai-agents-new-research-shows-memory-poisoning-can-dupe-them-into-remembering-fake-information-and-its-a-huge-security-risk"
+        },
+        {
+          "rank": 3,
+          "title": "What Is AI Memory? The Complete Guide to Memory for AI Agents",
+          "url": "https://aimemoryworks.com/"
+        },
+        {
+          "rank": 4,
+          "title": "SelfMem: Self-Optimizing Memory for AI Agents",
+          "url": "https://arxiv.org/abs/2607.03726"
+        },
+        {
+          "rank": 5,
+          "title": "Memoria: A Scalable Agentic Memory Framework for Personalized Conversational AI",
+          "url": "https://arxiv.org/abs/2512.12686"
+        },
+        {
+          "rank": 6,
+          "title": "Memory in the Age of AI Agents",
+          "url": "https://arxiv.org/abs/2512.13564"
+        },
+        {
+          "rank": 7,
+          "title": "MIRIX: Multi-Agent Memory System for LLM-Based Agents",
+          "url": "https://arxiv.org/abs/2507.07957"
+        },
+        {
+          "rank": 8,
+          "title": "AI Agent Memory: Types, Storage, and Retrieval Guide – n8n Blog",
+          "url": "https://blog.n8n.io/ai-agent-memory/"
+        },
+        {
+          "rank": 9,
+          "title": "[2603.07670] Memory for Autonomous LLM Agents:Mechanisms, Evaluation, and Emerging Frontiers",
+          "url": "https://doi.org/10.48550/arXiv.2603.07670"
+        },
+        {
+          "rank": 10,
+          "title": "Agent memory - Azure Databricks | Microsoft Learn",
+          "url": "https://learn.microsoft.com/en-us/azure/databricks/generative-ai/agent-framework/stateful-agents"
+        }
+      ]
+    },
+    {
+      "query": "remote MCP memory",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "Remote MCP Memory Server",
+          "url": "https://memory.mcpgenerator.com/"
+        },
+        {
+          "rank": 2,
+          "title": "RAMC: Remote Access Memory Channels over HPE Slingshot",
+          "url": "https://arxiv.org/abs/2606.05094"
+        },
+        {
+          "rank": 3,
+          "title": "A First Measurement Study on Authentication Security in Real-World Remote MCP Servers",
+          "url": "https://arxiv.org/abs/2605.22333"
+        },
+        {
+          "rank": 4,
+          "title": "Device Context Protocol: A Compact, Safety-First Architecture for LLM-Driven Control of Constrained Devices",
+          "url": "https://arxiv.org/abs/2605.26159"
+        },
+        {
+          "rank": 5,
+          "title": "Memory | XMDB",
+          "url": "https://xmdb.ai/memory"
+        },
+        {
+          "rank": 6,
+          "title": "Feedback-Normalized Developer Memory for Reinforcement-Learning Coding Agents: A Safety-Gated MCP Architecture",
+          "url": "https://arxiv.org/abs/2605.01567"
+        },
+        {
+          "rank": 7,
+          "title": "Get Started with the Operations Agent Remote MCP Server (Preview) - Microsoft Fabric | Microsoft Learn",
+          "url": "https://learn.microsoft.com/en-us/fabric/real-time-intelligence/mcp-remote-operations-agent"
+        },
+        {
+          "rank": 8,
+          "title": "MCP Server | Mnemoverse Docs",
+          "url": "https://mnemoverse.com/docs/api/mcp-server"
+        },
+        {
+          "rank": 9,
+          "title": "Introduction - Memory Protocol",
+          "url": "https://memory.mintlify.app/api-reference/mcp/introduction"
+        },
+        {
+          "rank": 10,
+          "title": "doobidoo/mcp-memory-service v4.0.0 on GitHub",
+          "url": "https://newreleases.io/project/github/doobidoo/mcp-memory-service/release/v4.0.0"
+        }
+      ]
+    },
+    {
+      "query": "user-owned searchable AI memory",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "Basic Memory: Open Source AI Memory & Knowledge Base (MCP)",
+          "url": "https://basicmemory.com/"
+        },
+        {
+          "rank": 2,
+          "title": "Kumbukum - Your AI finally knows you",
+          "url": "https://kumbukum.com/"
+        },
+        {
+          "rank": 3,
+          "title": "UOMP - User-Owned Memory Protocol",
+          "url": "https://www.uomp.org/en/"
+        },
+        {
+          "rank": 4,
+          "title": "Selfara — Stop re-explaining yourself to AI",
+          "url": "https://selfara.app/"
+        },
+        {
+          "rank": 5,
+          "title": "Amber | Never forget what made you, you",
+          "url": "https://ambermem.com/"
+        },
+        {
+          "rank": 6,
+          "title": "Adamant portable AI memory",
+          "url": "https://adamantmemory.com/"
+        },
+        {
+          "rank": 7,
+          "title": "Pamie - Lifecycle-managed memory for MCP agents",
+          "url": "https://pamie.io/"
+        },
+        {
+          "rank": 8,
+          "title": "Conch — Own Your AI Memory",
+          "url": "https://conchportal.com/"
+        },
+        {
+          "rank": 9,
+          "title": "Portable, private memory for your AI work | Mnemolog",
+          "url": "https://www.mnemolog.com/"
+        },
+        {
+          "rank": 10,
+          "title": "StashBase — Turn local files into searchable context for Agents",
+          "url": "https://stashbase.ai/"
+        }
+      ]
+    },
+    {
+      "query": "searchable memory for ChatGPT",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "Memory and new controls for ChatGPT | OpenAI",
+          "url": "https://openai.com/index/memory-and-new-controls-for-chatgpt/"
+        },
+        {
+          "rank": 2,
+          "title": "Memory FAQ | OpenAI Help Center",
+          "url": "https://help-lb.openai.com/en/articles/8590148"
+        },
+        {
+          "rank": 3,
+          "title": "Portable, private memory for your AI work | Mnemolog",
+          "url": "https://www.mnemolog.com/"
+        },
+        {
+          "rank": 4,
+          "title": "Basic Memory Cloud for ChatGPT | Basic Memory",
+          "url": "https://basicmemory.com/for/chatgpt"
+        },
+        {
+          "rank": 5,
+          "title": "AI Memory for ChatGPT, Claude & Gemini | Rethread",
+          "url": "https://rethread.dev/"
+        },
+        {
+          "rank": 6,
+          "title": "CapsuleBase — Local Knowledge OS",
+          "url": "https://capsulebase.ai/"
+        },
+        {
+          "rank": 7,
+          "title": "File storage and Library in ChatGPT  | OpenAI Help Center",
+          "url": "https://help-lb.openai.com/en/articles/20001052-file-storage-and-library-in-chatgpt"
+        },
+        {
+          "rank": 8,
+          "title": "Una base más sólida para la memoria de ChatGPT | OpenAI",
+          "url": "https://openai.com/es-ES/index/chatgpt-memory-dreaming/"
+        },
+        {
+          "rank": 9,
+          "title": "MemoryPlugin Documentation - MemoryPlugin",
+          "url": "https://help.memoryplugin.com/"
+        },
+        {
+          "rank": 10,
+          "title": "The Algorithmic Self-Portrait: Deconstructing Memory in ChatGPT",
+          "url": "https://arxiv.org/abs/2602.01450"
+        }
+      ]
+    },
+    {
+      "query": "Cloudflare ChatGPT memory MCP",
+      "memheaven_rank": null,
+      "results": [
+        {
+          "rank": 1,
+          "title": "Cloudflare AI Cloud",
+          "url": "https://www.cloudflare.com/solutions/ai/"
+        },
+        {
+          "rank": 2,
+          "title": "Cloudflare's own MCP servers · Cloudflare Agents docs",
+          "url": "https://developers.cloudflare.com/agents/model-context-protocol/cloudflare/servers-for-cloudflare/"
+        },
+        {
+          "rank": 3,
+          "title": "GitHub - cloudflare/mcp-server-cloudflare · GitHub",
+          "url": "https://github.com/cloudflare/mcp-server-cloudflare"
+        },
+        {
+          "rank": 4,
+          "title": "GitHub - cloudflare/mcp: MCP server for the Cloudflare API · GitHub",
+          "url": "https://github.com/cloudflare/mcp"
+        },
+        {
+          "rank": 5,
+          "title": "DEX MCP server · Cloudflare One docs",
+          "url": "https://developers.cloudflare.com/cloudflare-one/insights/dex/dex-mcp-server/"
+        },
+        {
+          "rank": 6,
+          "title": "Cloudflare Agent Memory docs · Cloudflare Agent Memory docs",
+          "url": "https://developers.cloudflare.com/agent-memory/"
+        },
+        {
+          "rank": 7,
+          "title": "How Agent Memory works · Cloudflare Agent Memory docs",
+          "url": "https://developers.cloudflare.com/agent-memory/concepts/how-agent-memory-works/"
+        },
+        {
+          "rank": 8,
+          "title": "What is the Model Context Protocol (MCP)?",
+          "url": "https://www.cloudflare.com/learning/ai/what-is-model-context-protocol-mcp/"
+        },
+        {
+          "rank": 9,
+          "title": "What is an MCP client?",
+          "url": "https://www.cloudflare.com/learning/ai/mcp-client-and-server/"
+        },
+        {
+          "rank": 10,
+          "title": "GitHub - supermemoryai/supermemory-mcp: Your memories are in ChatGPT... But nowhere else. Universal Memory MCP makes your memories available to every single LLM. No logins or paywall. One command to set it up. · GitHub",
+          "url": "https://github.com/supermemoryai/supermemory-mcp"
+        }
+      ]
+    }
+  ]
+}

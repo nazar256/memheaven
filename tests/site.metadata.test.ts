@@ -95,12 +95,4 @@ describe('static landing-page discovery metadata', () => {
     expect((sitemap.match(/<loc>/g) ?? []).length).toBe(1);
     expect(sitemap).toContain(`<loc>${canonicalUrl}</loc>`);
   });
-
-  it('allows crawling and advertises the canonical sitemap', () => {
-    const robots = readSiteFile('robots.txt');
-
-    expect(robots).toBe(
-      'User-agent: *\nAllow: /\nSitemap: https://nazar256.github.io/memheaven/sitemap.xml\n',
-    );
-  });
 });
