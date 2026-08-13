@@ -29,6 +29,10 @@ describe('Glama MCP composition', () => {
       expect(client.getServerVersion()?.name).toBe('memheaven');
       const listed = await client.listTools();
       expect(listed.tools).toHaveLength(34);
+      const missingToolTitles = listed.tools
+        .filter((tool) => typeof tool.title !== 'string' || tool.title.trim().length === 0 || tool.annotations?.title !== tool.title)
+        .map((tool) => tool.name);
+      expect(missingToolTitles).toEqual([]);
       const missingParameterDescriptions = listed.tools.flatMap((tool) => Object.entries(tool.inputSchema.properties ?? {})
         .filter(([, schema]) => {
           const description = (schema as { description?: unknown }).description;
