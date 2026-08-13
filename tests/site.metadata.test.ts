@@ -90,6 +90,7 @@ describe('static landing-page discovery metadata', () => {
 
   it('keeps the README category definition aligned with the landing page', () => {
     const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+    expect(readme).toContain('**MemHeaven is a self-hosted MCP memory server for ChatGPT and other cloud AI agents.**');
     expect(readme).toContain('## What is an MCP memory server?');
     expect(readme).toContain('stores durable information outside the current chat');
     expect(readme).toContain('write, search, update, and delete scoped records');
