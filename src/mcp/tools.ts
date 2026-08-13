@@ -110,6 +110,47 @@ function arrayResult(key: string, items: unknown[]) {
   return structuredResult({ [key]: items });
 }
 
+const TOOL_TITLES: Record<string, string> = {
+  mempalace_status: 'Memory service status',
+  mempalace_wake_context: 'Start memory context',
+  mempalace_list_wings: 'List memory wings',
+  mempalace_list_rooms: 'List memory rooms',
+  mempalace_get_taxonomy: 'Get memory taxonomy',
+  mempalace_get_aaak_spec: 'Get memory note guidance',
+  mempalace_search: 'Search memory',
+  mempalace_check_duplicate: 'Check memory duplicate',
+  mempalace_get_drawer: 'Get memory drawer',
+  mempalace_list_drawers: 'List memory drawers',
+  mempalace_add_drawer: 'Add memory drawer',
+  mempalace_update_drawer: 'Update memory drawer',
+  mempalace_delete_drawer: 'Delete memory drawer',
+  mempalace_diary_write: 'Write diary entry',
+  mempalace_diary_read: 'Read diary entries',
+  mempalace_diary_search: 'Search diary entries',
+  mempalace_diary_reindex: 'Reindex diary entries',
+  mempalace_kg_query: 'Query knowledge graph',
+  mempalace_kg_check: 'Check knowledge graph',
+  mempalace_kg_add: 'Add knowledge graph fact',
+  mempalace_kg_invalidate: 'Invalidate knowledge graph fact',
+  mempalace_kg_timeline: 'Show knowledge graph timeline',
+  mempalace_kg_stats: 'Show knowledge graph stats',
+  mempalace_traverse: 'Traverse memory graph',
+  mempalace_find_tunnels: 'Find memory tunnels',
+  mempalace_graph_stats: 'Show memory graph stats',
+  mempalace_create_tunnel: 'Create memory tunnel',
+  mempalace_list_tunnels: 'List memory tunnels',
+  mempalace_delete_tunnel: 'Delete memory tunnel',
+  mempalace_follow_tunnels: 'Follow memory tunnels',
+  mempalace_hook_settings: 'Get memory hook settings',
+  mempalace_memories_filed_away: 'Get memory filing status',
+  mempalace_reconnect: 'Check memory backend health',
+  mempalace_sync: 'Check filesystem sync support',
+};
+
+function toolTitle(name: string): string {
+  return TOOL_TITLES[name] ?? name;
+}
+
 function registerReadOnlyTool(
   server: McpServer,
   name: string,
@@ -123,10 +164,12 @@ function registerReadOnlyTool(
   server.registerTool(
     name,
     {
+      title: toolTitle(name),
       description,
       inputSchema: schema,
       outputSchema,
       annotations: {
+        title: toolTitle(name),
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
@@ -162,10 +205,12 @@ function registerWriteTool(
   server.registerTool(
     name,
     {
+      title: toolTitle(name),
       description,
       inputSchema: schema,
       outputSchema,
       annotations: {
+        title: toolTitle(name),
         readOnlyHint: false,
         destructiveHint: options?.destructiveHint ?? false,
         idempotentHint: options?.idempotentHint ?? false,
@@ -270,10 +315,12 @@ export function registerMemPalaceTools(server: McpServer, deps: ToolDependencies
   server.registerTool(
     'mempalace_follow_tunnels',
     {
+      title: toolTitle('mempalace_follow_tunnels'),
       description: 'Follow explicit tunnels connected to a wing/room location.',
       inputSchema: followTunnelsSchema,
       outputSchema: followTunnelsOutputSchema,
       annotations: {
+        title: toolTitle('mempalace_follow_tunnels'),
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
@@ -326,10 +373,12 @@ export function registerMemPalaceTools(server: McpServer, deps: ToolDependencies
   server.registerTool(
     'mempalace_sync',
     {
+      title: toolTitle('mempalace_sync'),
       description: 'Filesystem sync is unsupported because this MCP deployment has no local project directory to scan.',
       inputSchema: syncSchema,
       outputSchema: syncOutputSchema,
       annotations: {
+        title: toolTitle('mempalace_sync'),
         readOnlyHint: true,
         destructiveHint: false,
         idempotentHint: true,
