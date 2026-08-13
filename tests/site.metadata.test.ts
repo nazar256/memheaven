@@ -27,7 +27,8 @@ describe('static landing-page discovery metadata', () => {
     const socialImage =
       'https://raw.githubusercontent.com/nazar256/memheaven/main/assets/memheaven-logo.png';
 
-    expect(html).toContain('<title>MemHeaven — Self-hosted long-term memory for ChatGPT and MCP</title>');
+    const title = 'MemHeaven — Self-hosted remote MCP memory for ChatGPT and AI agents';
+    expect(html).toContain(`<title>${title}</title>`);
     expect((html.match(/<link rel="canonical"\s/gi) ?? []).length).toBe(1);
     expect(html).toContain(`<link rel="canonical" href="${canonicalUrl}" />`);
     expect(metaContent(html, 'name', 'description')).toBe(description);
@@ -36,16 +37,12 @@ describe('static landing-page discovery metadata', () => {
     );
     expect(metaContent(html, 'property', 'og:type')).toBe('website');
     expect(metaContent(html, 'property', 'og:url')).toBe(canonicalUrl);
-    expect(metaContent(html, 'property', 'og:title')).toBe(
-      'MemHeaven — Self-hosted long-term memory for ChatGPT and MCP',
-    );
+    expect(metaContent(html, 'property', 'og:title')).toBe(title);
     expect(metaContent(html, 'property', 'og:description')).toBe(description);
     expect(metaContent(html, 'property', 'og:image')).toBe(socialImage);
     expect(metaContent(html, 'property', 'og:image:alt')).toBe('MemHeaven logo');
     expect(metaContent(html, 'name', 'twitter:card')).toBe('summary');
-    expect(metaContent(html, 'name', 'twitter:title')).toBe(
-      'MemHeaven — Self-hosted long-term memory for ChatGPT and MCP',
-    );
+    expect(metaContent(html, 'name', 'twitter:title')).toBe(title);
     expect(metaContent(html, 'name', 'twitter:description')).toBe(description);
     expect(metaContent(html, 'name', 'twitter:image')).toBe(socialImage);
 
@@ -69,7 +66,8 @@ describe('static landing-page discovery metadata', () => {
     });
     expect(html).toContain('Self-hosted ChatGPT memory over remote MCP');
     expect(html).toContain('<h2>ChatGPT long-term memory, under your control</h2>');
-    expect(html).toContain('<h1>Self-hosted long-term memory for ChatGPT and AI agents</h1>');
+    expect(html).toContain('<h1>Self-hosted remote MCP memory for ChatGPT and AI agents</h1>');
+    expect(html).toContain('<h2>Remote versus local MCP memory</h2>');
     expect(html).toContain('How does this give ChatGPT durable memory?');
     expect(html).toContain("MemHeaven is a separate, inspectable memory layer that you deploy and control.");
     expect(html).toContain('<h2>When MemHeaven fits</h2>');
