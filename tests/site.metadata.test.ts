@@ -23,7 +23,7 @@ describe('static landing-page discovery metadata', () => {
     const html = readSiteFile('index.html');
     const canonicalUrl = 'https://nazar256.github.io/memheaven/';
     const description =
-      'Self-hosted remote MCP memory for ChatGPT and AI agents: searchable, user-controlled long-term memory on Cloudflare.';
+      'Self-hosted remote MCP memory for ChatGPT and AI agents: searchable, user-owned long-term memory on Cloudflare.';
     const socialImage =
       'https://raw.githubusercontent.com/nazar256/memheaven/main/assets/memheaven-logo.png';
 
