@@ -196,6 +196,12 @@
       </section>
 
       <section>
+        <h2>What is an MCP memory server?</h2>
+        <p>An MCP memory server is an external service that stores durable information outside the current chat and exposes memory operations to an AI client over the Model Context Protocol. In practice, an agent can write, search, update, and delete scoped records instead of starting every session cold.</p>
+        <p>MemHeaven is the self-hosted remote variant: you deploy the MCP server and its storage in your own Cloudflare account, then connect ChatGPT or another compatible client to the authenticated <code>/mcp</code> endpoint.</p>
+      </section>
+
+      <section>
         <h2>Self-hosted ChatGPT memory over remote MCP</h2>
         <p>ChatGPT is the primary hosted-client target today. Other remote clients are documented honestly in the compatibility matrix as expected, experimental, or unknown until they are verified.</p>
         <p><a class="link" href="https://github.com/nazar256/memheaven/blob/main/docs/CLIENT_COMPATIBILITY.md">See the client compatibility matrix →</a></p>

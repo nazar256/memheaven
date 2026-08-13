@@ -68,6 +68,9 @@ describe('static landing-page discovery metadata', () => {
     expect(html).toContain('<h2>ChatGPT long-term memory, under your control</h2>');
     expect(html).toContain('<h1>Self-hosted remote MCP long-term memory for ChatGPT and AI agents</h1>');
     expect(html).toContain('<h2>Remote versus local MCP memory</h2>');
+    expect(html).toContain('<h2>What is an MCP memory server?</h2>');
+    expect(html).toContain('stores durable information outside the current chat');
+    expect(html).toContain('write, search, update, and delete scoped records');
     expect(html).toContain('<h2>How to give ChatGPT persistent external memory</h2>');
     expect(html).toContain("In ChatGPT, add an MCP connector using your deployment's authenticated <code>/mcp</code> URL");
     expect(html).toContain('How does this give ChatGPT durable memory?');
