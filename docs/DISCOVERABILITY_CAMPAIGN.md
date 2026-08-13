@@ -27,11 +27,11 @@ Do not silently change this set between checkpoints:
 
 At each meaningful checkpoint, use unauthenticated public web search and retain a full ordered manifest of result URLs and titles for all ten queries, plus the exact timestamp, locale/method metadata, and first-ten presence count. The baseline on 2026-08-12 was `0/10` first-ten result sets; the short delayed recheck was also `0/10` and was not treated as exhaustion.
 
-The next propagation clock starts only after the current content/crawl patch is merged and GitHub Pages confirms deployment. Run the full manifest at approximately:
+The current content patch was confirmed live at `2026-08-13T05:52:50Z` after PR #8 merged and Pages succeeded. Run the full manifest at approximately:
 
-- 24 hours after that deployment;
-- 72 hours after that deployment;
-- 7 days after that deployment.
+- `2026-08-14T05:52:50Z` (24 hours);
+- `2026-08-16T05:52:50Z` (72 hours);
+- `2026-08-20T05:52:50Z` (7 days).
 
 Compare rank and presence against the retained baseline; do not replace the fixed queries with easier branded queries.
 
