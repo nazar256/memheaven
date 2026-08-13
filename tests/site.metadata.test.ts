@@ -78,6 +78,8 @@ describe('static landing-page discovery metadata', () => {
     expect(html).toContain('How does this give ChatGPT durable memory?');
     expect(html).toContain("MemHeaven is a separate, inspectable memory layer that you deploy and control.");
     expect(html).toContain('<h2>When MemHeaven fits</h2>');
+    expect(html).toContain('<strong>Trusted clients need one deployment.</strong>');
+    expect(html).toContain('For unrelated organizations, separate deployments provide stronger isolation.');
     expect(html).toContain('<h2>External memory, not a replacement for ChatGPT memory</h2>');
     expect(html).toContain('There is no shared public MemHeaven instance.');
     expect(html).toContain('<strong>Is this Cloudflare Agent Memory?</strong>');
@@ -92,6 +94,7 @@ describe('static landing-page discovery metadata', () => {
     const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
     expect(readme).toContain('**MemHeaven is a self-hosted MCP memory server for ChatGPT and other cloud AI agents.**');
     expect(readme).toContain('## What is an MCP memory server?');
+    expect(readme).toContain('Several compatible clients or trusted users need one deployment with tenant-scoped memory');
     expect(readme).toContain('stores durable information outside the current chat');
     expect(readme).toContain('write, search, update, and delete scoped records');
     expect(readme).toContain('self-hosted remote variant');

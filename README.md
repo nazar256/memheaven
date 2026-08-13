@@ -32,6 +32,7 @@ Choose MemHeaven when a hosted client or AI agent needs a searchable memory laye
 - ChatGPT needs to retrieve project decisions, preferences, notes, or other durable context across chats.
 - A remote MCP client cannot depend on a memory service running only on your laptop.
 - Separate users or workflows need tenant-scoped access to stored context.
+- Several compatible clients or trusted users need one deployment with tenant-scoped memory; use separate deployments for unrelated organizations.
 - You want to inspect, search, and delete the records held by your own deployment.
 
 ## External memory, not a replacement for ChatGPT memory
