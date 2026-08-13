@@ -153,7 +153,7 @@
           alt="MemHeaven logo"
         />
         <div class="eyebrow">Remote MCP memory you own</div>
-        <h1>MemHeaven</h1>
+        <h1>Self-hosted long-term memory for ChatGPT and AI agents</h1>
         <p class="headline">Bring <a class="link" href="https://github.com/mempalace/mempalace">MemPalace</a>-style long-term memory to ChatGPT and remote AI agents.</p>
         <p>MemHeaven is a self-hosted remote MCP memory server that gives hosted AI clients searchable long-term memory you own.</p>
         <p>Self-host on Cloudflare without a VM, Docker, or database admin. Free-tier limits apply, and heavier usage may require paid Cloudflare usage.</p>
@@ -172,6 +172,15 @@
           <div class="card"><strong>AI chats forget.</strong><p>Project context, preferences, and prior decisions often disappear between chats and sessions.</p></div>
           <div class="card"><strong>Hosted clients need remote MCP.</strong><p>Local-first memory tools are useful, but hosted tools like ChatGPT and other remote agents need a network-accessible memory layer.</p></div>
           <div class="card"><strong>You should own the memory.</strong><p>MemHeaven is built for searchable, inspectable, deletable, portable memory that is not hidden behind a third-party SaaS memory product.</p></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>When MemHeaven fits</h2>
+        <div class="grid">
+          <div class="card"><strong>ChatGPT needs project context.</strong><p>Connect ChatGPT to your deployment when you need it to search decisions, preferences, notes, and other durable context across chats.</p></div>
+          <div class="card"><strong>Remote agents need one memory boundary.</strong><p>Use a remote MCP endpoint when hosted clients cannot depend on a laptop-local memory service.</p></div>
+          <div class="card"><strong>Memory must stay scoped and inspectable.</strong><p>Keep stored context in your own Cloudflare account with tenant-scoped access, searchable retrieval, and deletion tools.</p></div>
         </div>
       </section>
 
@@ -198,6 +207,12 @@
           </div>
         </div>
         <p><a class="link" href="https://github.com/nazar256/memheaven#chatgpt-setup">Follow the ChatGPT setup guide →</a></p>
+      </section>
+
+      <section>
+        <h2>External memory, not a replacement for ChatGPT memory</h2>
+        <p>MemHeaven does not change ChatGPT's built-in memory. It is a separate MCP service that your client can call for context you store in your own deployment.</p>
+        <p>There is no shared public MemHeaven instance. You operate the Worker, storage bindings, OAuth configuration, and access keys in your own Cloudflare account.</p>
       </section>
 
       <section>
@@ -229,7 +244,7 @@
       </section>
 
       <footer>
-        Static landing-page scaffold for MemHeaven. The repository remains the source of truth.
+        MemHeaven is open source. The GitHub repository contains the source and deployment docs.
       </footer>
     </main>
   </body>
