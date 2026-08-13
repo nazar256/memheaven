@@ -78,6 +78,8 @@ describe('static landing-page discovery metadata', () => {
     expect(html).toContain('<h2>When MemHeaven fits</h2>');
     expect(html).toContain('<h2>External memory, not a replacement for ChatGPT memory</h2>');
     expect(html).toContain('There is no shared public MemHeaven instance.');
+    expect(html).toContain('<strong>Is this Cloudflare Agent Memory?</strong>');
+    expect(html).toContain('Cloudflare Agent Memory is a separate private-beta product');
     expect(html).toContain('MemHeaven is open source.');
     expect(html).toContain('GitHub repository contains the source and deployment docs.');
     expect(html).not.toContain('Static landing-page scaffold for MemHeaven.');
@@ -90,6 +92,8 @@ describe('static landing-page discovery metadata', () => {
     expect(readme).toContain('stores durable information outside the current chat');
     expect(readme).toContain('write, search, update, and delete scoped records');
     expect(readme).toContain('self-hosted remote variant');
+    expect(readme).toContain('## MemHeaven versus Cloudflare Agent Memory');
+    expect(readme).toContain('Cloudflare Agent Memory is a separate private-beta Cloudflare product');
   });
 
   it('publishes a canonical sitemap for the GitHub Pages site', () => {
