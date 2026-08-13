@@ -30,10 +30,11 @@ Public product docs should treat `docs/PROJECT_STATE.md` and `README.md` as the 
 - Discovery is confirmed on the Official MCP Registry, mcpservers.org, mcp.so, and Glama. mcp.so’s public listing is accurate, but its internal `memheaven` search is stale while known searches work; the no-cost support ticket requires an authenticated account, and paid submission is out of scope.
 - TensorBlock’s index had no duplicate; factual intake issue #1703 is open at `https://github.com/TensorBlock/awesome-mcp-servers/issues/1703`. Upstream awesome-mcp-servers PR #11926 remains open and maintainer-controlled.
 - Search Console is now verified for `https://nazar256.github.io/memheaven/`; the sitemap was submitted but initially reported `Could not read sitemap`, and URL Inspection reported `URL is not on Google` / `Unknown to Google`. One authenticated indexing request was accepted into Google's priority crawl queue. These are crawl/process signals, not evidence of indexing or ranking. The tracked campaign contract, exact query/checkpoint protocol, and sanitized ordered baseline are in [`docs/DISCOVERABILITY_CAMPAIGN.md`](docs/DISCOVERABILITY_CAMPAIGN.md) and [`docs/DISCOVERABILITY_BASELINE_2026-08-12.json`](docs/DISCOVERABILITY_BASELINE_2026-08-12.json); detailed private evidence remains under `.tmp/campaign/`.
+- Official MCP Registry verification on 2026-08-13 found one active latest `io.github.nazar256/memheaven` record at version `0.1.0`; its live `websiteUrl` is still the GitHub repository instead of the canonical Pages landing page in tracked `server.json`. The official publisher validates the tracked metadata. Treat this as an existing-record refresh candidate, not a new directory submission; no registry mutation was made.
 
 ## Open follow-ups
 
 1. Rotate/remove any temporary smoke-test keys from the deployed Worker secret if configured deployment access is available.
 2. Verify Claude hosted connector flow before upgrading it beyond Expected in docs.
 3. Verify VS Code / Copilot hosted OAuth before adding any exact non-loopback callback.
-4. Continue the discoverability campaign at the recorded 24-hour, 72-hour, and 7-day checkpoints; do not change the fixed query set or create duplicate catalog listings.
+4. Continue the discoverability campaign at the recorded 24-hour, 72-hour, and 7-day checkpoints; do not change the fixed query set or create duplicate catalog listings. Refresh the existing Official MCP Registry record only through its owner-authenticated publisher flow, then verify the API result.
