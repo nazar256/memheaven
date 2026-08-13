@@ -38,6 +38,12 @@ Choose MemHeaven when a hosted client or AI agent needs a searchable memory laye
 
 MemHeaven does not change ChatGPT's built-in memory. It is a separate OAuth-protected MCP service that your client can call for context stored in your own deployment. There is no shared public MemHeaven instance: you operate the Worker, storage bindings, OAuth configuration, and access keys in your Cloudflare account.
 
+## What is an MCP memory server?
+
+An MCP memory server is an external service that stores durable information outside the current chat and exposes memory operations to an AI client over the Model Context Protocol. In practice, an agent can write, search, update, and delete scoped records instead of starting every session cold.
+
+MemHeaven is the self-hosted remote variant: you deploy the MCP server and its storage in your own Cloudflare account, then connect ChatGPT or another compatible client to the authenticated `/mcp` endpoint.
+
 ## ChatGPT long-term memory over remote MCP
 
 If you want ChatGPT to use a searchable memory layer across chats without putting that memory in a shared third-party service, deploy MemHeaven in your own Cloudflare account and connect ChatGPT to your instance's `/mcp` endpoint. This external memory complements ChatGPT's built-in memory: you can inspect, search, and delete the records stored by your own deployment. See the [ChatGPT setup](#chatgpt-setup) and [security model](docs/SECURITY.md) before connecting a client.

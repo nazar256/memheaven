@@ -84,6 +84,14 @@ describe('static landing-page discovery metadata', () => {
     expect(html).toContain('https://github.com/nazar256/memheaven#chatgpt-setup');
   });
 
+  it('keeps the README category definition aligned with the landing page', () => {
+    const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+    expect(readme).toContain('## What is an MCP memory server?');
+    expect(readme).toContain('stores durable information outside the current chat');
+    expect(readme).toContain('write, search, update, and delete scoped records');
+    expect(readme).toContain('self-hosted remote variant');
+  });
+
   it('publishes a canonical sitemap for the GitHub Pages site', () => {
     const canonicalUrl = 'https://nazar256.github.io/memheaven/';
     const sitemap = readSiteFile('sitemap.xml');
