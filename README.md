@@ -49,7 +49,7 @@ An MCP memory server is an external service that stores durable information outs
 
 MemHeaven is the self-hosted remote variant: you deploy the MCP server and its storage in your own Cloudflare account, then connect ChatGPT or another compatible client to the authenticated `/mcp` endpoint.
 
-MCP memory complements document retrieval rather than replacing it: RAG searches a pre-existing corpus, while a memory server preserves durable facts, decisions, and context learned during agent interactions. MemHeaven is for searchable cross-session memory, not a generic document-ingestion service.
+MCP memory complements document retrieval rather than replacing it: RAG is a retrieval technique for finding relevant passages from an indexed corpus, while MemHeaven provides a durable write/search/update/delete lifecycle for scoped cross-session records. The two patterns can be combined; MemHeaven is not a generic document-ingestion service.
 
 ## ChatGPT long-term memory over remote MCP
 

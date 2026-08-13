@@ -200,7 +200,7 @@
         <h2>What is an MCP memory server?</h2>
         <p>An MCP memory server is an external service that stores durable information outside the current chat and exposes memory operations to an AI client over the Model Context Protocol. In practice, an agent can write, search, update, and delete scoped records instead of starting every session cold.</p>
         <p>MemHeaven is the self-hosted remote variant: you deploy the MCP server and its storage in your own Cloudflare account, then connect ChatGPT or another compatible client to the authenticated <code>/mcp</code> endpoint.</p>
-        <p>MCP memory complements document retrieval rather than replacing it: RAG searches a pre-existing corpus, while a memory server preserves durable facts, decisions, and context learned during agent interactions. MemHeaven is for searchable cross-session memory, not a generic document-ingestion service.</p>
+        <p>MCP memory complements document retrieval rather than replacing it: RAG is a retrieval technique for finding relevant passages from an indexed corpus, while MemHeaven provides a durable write/search/update/delete lifecycle for scoped cross-session records. The two patterns can be combined; MemHeaven is not a generic document-ingestion service.</p>
       </section>
 
       <section>
