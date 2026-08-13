@@ -23,11 +23,12 @@ describe('static landing-page discovery metadata', () => {
     const html = readSiteFile('index.html');
     const canonicalUrl = 'https://nazar256.github.io/memheaven/';
     const description =
-      'Self-hosted remote MCP memory for ChatGPT and AI agents: searchable, user-controlled long-term memory on Cloudflare.';
+      'Self-hosted remote MCP memory for ChatGPT and AI agents: searchable, user-owned long-term memory on Cloudflare.';
     const socialImage =
       'https://raw.githubusercontent.com/nazar256/memheaven/main/assets/memheaven-logo.png';
 
-    expect(html).toContain('<title>MemHeaven — Self-hosted long-term memory for ChatGPT and MCP</title>');
+    const title = 'MemHeaven — Self-hosted MCP memory server for ChatGPT';
+    expect(html).toContain(`<title>${title}</title>`);
     expect((html.match(/<link rel="canonical"\s/gi) ?? []).length).toBe(1);
     expect(html).toContain(`<link rel="canonical" href="${canonicalUrl}" />`);
     expect(metaContent(html, 'name', 'description')).toBe(description);
@@ -36,16 +37,12 @@ describe('static landing-page discovery metadata', () => {
     );
     expect(metaContent(html, 'property', 'og:type')).toBe('website');
     expect(metaContent(html, 'property', 'og:url')).toBe(canonicalUrl);
-    expect(metaContent(html, 'property', 'og:title')).toBe(
-      'MemHeaven — Self-hosted long-term memory for ChatGPT and MCP',
-    );
+    expect(metaContent(html, 'property', 'og:title')).toBe(title);
     expect(metaContent(html, 'property', 'og:description')).toBe(description);
     expect(metaContent(html, 'property', 'og:image')).toBe(socialImage);
     expect(metaContent(html, 'property', 'og:image:alt')).toBe('MemHeaven logo');
     expect(metaContent(html, 'name', 'twitter:card')).toBe('summary');
-    expect(metaContent(html, 'name', 'twitter:title')).toBe(
-      'MemHeaven — Self-hosted long-term memory for ChatGPT and MCP',
-    );
+    expect(metaContent(html, 'name', 'twitter:title')).toBe(title);
     expect(metaContent(html, 'name', 'twitter:description')).toBe(description);
     expect(metaContent(html, 'name', 'twitter:image')).toBe(socialImage);
 
@@ -69,16 +66,46 @@ describe('static landing-page discovery metadata', () => {
     });
     expect(html).toContain('Self-hosted ChatGPT memory over remote MCP');
     expect(html).toContain('<h2>ChatGPT long-term memory, under your control</h2>');
-    expect(html).toContain('<h1>Self-hosted long-term memory for ChatGPT and AI agents</h1>');
+    expect(html).toContain('<h1>Self-hosted MCP memory server for ChatGPT and AI agents</h1>');
+    expect(html).toContain('<h2>Remote versus local MCP memory</h2>');
+    expect(html).toContain('<h2>What is an MCP memory server?</h2>');
+    expect(html).toContain('stores durable information outside the current chat');
+    expect(html).toContain('write, search, update, and delete scoped records');
+    expect(html).toContain('MCP memory complements document retrieval rather than replacing it');
+    expect(html).toContain('RAG is a retrieval technique for finding relevant passages from an indexed corpus');
+    expect(html).toContain('durable write/search/update/delete lifecycle for scoped cross-session records');
+    expect(html).toContain('not a generic document-ingestion service');
+    expect(html).toContain('<h2>How to give ChatGPT persistent external memory</h2>');
+    expect(html).toContain("In ChatGPT, add an MCP connector using your deployment's authenticated <code>/mcp</code> URL");
     expect(html).toContain('How does this give ChatGPT durable memory?');
     expect(html).toContain("MemHeaven is a separate, inspectable memory layer that you deploy and control.");
     expect(html).toContain('<h2>When MemHeaven fits</h2>');
+    expect(html).toContain('<strong>Trusted clients need one deployment.</strong>');
+    expect(html).toContain('For unrelated organizations, separate deployments provide stronger isolation.');
     expect(html).toContain('<h2>External memory, not a replacement for ChatGPT memory</h2>');
     expect(html).toContain('There is no shared public MemHeaven instance.');
+    expect(html).toContain('<strong>Is this Cloudflare Agent Memory?</strong>');
+    expect(html).toContain('Cloudflare Agent Memory is a separate private-beta product');
     expect(html).toContain('MemHeaven is open source.');
     expect(html).toContain('GitHub repository contains the source and deployment docs.');
     expect(html).not.toContain('Static landing-page scaffold for MemHeaven.');
     expect(html).toContain('https://github.com/nazar256/memheaven#chatgpt-setup');
+  });
+
+  it('keeps the README category definition aligned with the landing page', () => {
+    const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+    expect(readme).toContain('**MemHeaven is a self-hosted MCP memory server for ChatGPT and other cloud AI agents.**');
+    expect(readme).toContain('## What is an MCP memory server?');
+    expect(readme).toContain('Several compatible clients or trusted users need one deployment with tenant-scoped memory');
+    expect(readme).toContain('stores durable information outside the current chat');
+    expect(readme).toContain('write, search, update, and delete scoped records');
+    expect(readme).toContain('self-hosted remote variant');
+    expect(readme).toContain('MCP memory complements document retrieval rather than replacing it');
+    expect(readme).toContain('RAG is a retrieval technique for finding relevant passages from an indexed corpus');
+    expect(readme).toContain('durable write/search/update/delete lifecycle for scoped cross-session records');
+    expect(readme).toContain('not a generic document-ingestion service');
+    expect(readme).toContain('## MemHeaven versus Cloudflare Agent Memory');
+    expect(readme).toContain('Cloudflare Agent Memory is a separate private-beta Cloudflare product');
   });
 
   it('publishes a canonical sitemap for the GitHub Pages site', () => {
