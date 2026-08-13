@@ -221,6 +221,17 @@
       </section>
 
       <section>
+        <h2>How to give ChatGPT persistent external memory</h2>
+        <ol>
+          <li>Deploy MemHeaven in your own Cloudflare account and create an access key.</li>
+          <li>In ChatGPT, add an MCP connector using your deployment's authenticated <code>/mcp</code> URL, then complete the OAuth flow.</li>
+          <li>Use the connector in your chats; optionally add the short agent memory instruction from the setup guide so ChatGPT knows when to read or write durable context.</li>
+        </ol>
+        <p>This adds a separate searchable memory layer for ChatGPT. It does not replace or alter ChatGPT's built-in memory, and the stored records remain in your deployment.</p>
+        <p><a class="link" href="https://github.com/nazar256/memheaven#chatgpt-setup">See the complete setup steps →</a></p>
+      </section>
+
+      <section>
         <h2>External memory, not a replacement for ChatGPT memory</h2>
         <p>MemHeaven does not change ChatGPT's built-in memory. It is a separate MCP service that your client can call for context you store in your own deployment.</p>
         <p>There is no shared public MemHeaven instance. You operate the Worker, storage bindings, OAuth configuration, and access keys in your own Cloudflare account.</p>
