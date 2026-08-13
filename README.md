@@ -2,9 +2,9 @@
 
 # MemHeaven
 
-**Bring [MemPalace](https://github.com/MemPalace/mempalace)-style long-term memory to ChatGPT and remote AI agents.**
+**MemHeaven is a self-hosted remote MCP memory server for ChatGPT and other cloud AI agents.**
 
-MemHeaven is a self-hosted remote MCP memory server that gives hosted AI clients searchable long-term memory you own.
+It gives hosted AI clients searchable long-term memory you own, deployed on Cloudflare. MemHeaven is inspired by [MemPalace](https://github.com/MemPalace/mempalace)'s long-term-memory model while using a remote deployment shape for hosted clients.
 
 **Deploy on a Cloudflare Free account. No VM, no Docker, no database admin.**
 
