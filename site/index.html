@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MemHeaven — Self-hosted remote MCP memory for ChatGPT and AI agents</title>
+    <title>MemHeaven — Self-hosted remote MCP long-term memory for ChatGPT</title>
     <meta
       name="description"
       content="Self-hosted remote MCP memory for ChatGPT and AI agents: searchable, user-controlled long-term memory on Cloudflare."
@@ -13,7 +13,7 @@
     <meta name="theme-color" content="#08101f" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://nazar256.github.io/memheaven/" />
-    <meta property="og:title" content="MemHeaven — Self-hosted remote MCP memory for ChatGPT and AI agents" />
+    <meta property="og:title" content="MemHeaven — Self-hosted remote MCP long-term memory for ChatGPT" />
     <meta
       property="og:description"
       content="Self-hosted remote MCP memory for ChatGPT and AI agents: searchable, user-controlled long-term memory on Cloudflare."
@@ -24,7 +24,7 @@
     />
     <meta property="og:image:alt" content="MemHeaven logo" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="MemHeaven — Self-hosted remote MCP memory for ChatGPT and AI agents" />
+    <meta name="twitter:title" content="MemHeaven — Self-hosted remote MCP long-term memory for ChatGPT" />
     <meta
       name="twitter:description"
       content="Self-hosted remote MCP memory for ChatGPT and AI agents: searchable, user-controlled long-term memory on Cloudflare."
@@ -153,7 +153,7 @@
           alt="MemHeaven logo"
         />
         <div class="eyebrow">Remote MCP memory you own</div>
-        <h1>Self-hosted remote MCP memory for ChatGPT and AI agents</h1>
+        <h1>Self-hosted remote MCP long-term memory for ChatGPT and AI agents</h1>
         <p class="headline">Bring <a class="link" href="https://github.com/mempalace/mempalace">MemPalace</a>-style long-term memory to ChatGPT and remote AI agents.</p>
         <p>MemHeaven is a self-hosted remote MCP memory server that gives hosted AI clients searchable long-term memory you own.</p>
         <p>Self-host on Cloudflare without a VM, Docker, or database admin. Free-tier limits apply, and heavier usage may require paid Cloudflare usage.</p>
@@ -186,11 +186,11 @@
 
       <section>
         <h2>Remote versus local MCP memory</h2>
-        <p>Local MCP memory is a good fit when the agent and its memory store run on the same machine. Remote MCP memory is useful when hosted clients such as ChatGPT need a network-accessible endpoint instead of a laptop-local process.</p>
+        <p>Local MCP memory is a good fit when the client can reach an MCP server running in the local environment, even if that server uses remote backing storage. Remote MCP memory is useful when hosted clients such as ChatGPT need a network-accessible MCP server instead of a laptop-local server process.</p>
         <p>MemHeaven follows the remote path: deploy the Worker and storage in your own Cloudflare account, then connect the client to your authenticated <code>/mcp</code> endpoint. This is a deployment distinction, not a claim that one model is universally better.</p>
         <ul>
-          <li>Choose local MCP memory when the client and store can stay on one machine.</li>
-          <li>Choose remote MCP memory when hosted clients need the same memory across devices.</li>
+          <li>Choose local MCP memory when the client can reach an MCP server running in the local environment.</li>
+          <li>Choose remote MCP memory when hosted clients need a network-accessible MCP server across devices.</li>
           <li>Choose MemHeaven when you want the remote path while keeping the Worker, storage, OAuth configuration, and memory records in your own Cloudflare account.</li>
         </ul>
       </section>

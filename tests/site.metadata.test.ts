@@ -27,7 +27,7 @@ describe('static landing-page discovery metadata', () => {
     const socialImage =
       'https://raw.githubusercontent.com/nazar256/memheaven/main/assets/memheaven-logo.png';
 
-    const title = 'MemHeaven — Self-hosted remote MCP memory for ChatGPT and AI agents';
+    const title = 'MemHeaven — Self-hosted remote MCP long-term memory for ChatGPT';
     expect(html).toContain(`<title>${title}</title>`);
     expect((html.match(/<link rel="canonical"\s/gi) ?? []).length).toBe(1);
     expect(html).toContain(`<link rel="canonical" href="${canonicalUrl}" />`);
@@ -66,7 +66,7 @@ describe('static landing-page discovery metadata', () => {
     });
     expect(html).toContain('Self-hosted ChatGPT memory over remote MCP');
     expect(html).toContain('<h2>ChatGPT long-term memory, under your control</h2>');
-    expect(html).toContain('<h1>Self-hosted remote MCP memory for ChatGPT and AI agents</h1>');
+    expect(html).toContain('<h1>Self-hosted remote MCP long-term memory for ChatGPT and AI agents</h1>');
     expect(html).toContain('<h2>Remote versus local MCP memory</h2>');
     expect(html).toContain('How does this give ChatGPT durable memory?');
     expect(html).toContain("MemHeaven is a separate, inspectable memory layer that you deploy and control.");
