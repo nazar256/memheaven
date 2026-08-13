@@ -71,6 +71,8 @@ describe('static landing-page discovery metadata', () => {
     expect(html).toContain('<h2>What is an MCP memory server?</h2>');
     expect(html).toContain('stores durable information outside the current chat');
     expect(html).toContain('write, search, update, and delete scoped records');
+    expect(html).toContain('MCP memory complements document retrieval rather than replacing it');
+    expect(html).toContain('not a generic document-ingestion service');
     expect(html).toContain('<h2>How to give ChatGPT persistent external memory</h2>');
     expect(html).toContain("In ChatGPT, add an MCP connector using your deployment's authenticated <code>/mcp</code> URL");
     expect(html).toContain('How does this give ChatGPT durable memory?');
@@ -92,6 +94,8 @@ describe('static landing-page discovery metadata', () => {
     expect(readme).toContain('stores durable information outside the current chat');
     expect(readme).toContain('write, search, update, and delete scoped records');
     expect(readme).toContain('self-hosted remote variant');
+    expect(readme).toContain('MCP memory complements document retrieval rather than replacing it');
+    expect(readme).toContain('not a generic document-ingestion service');
     expect(readme).toContain('## MemHeaven versus Cloudflare Agent Memory');
     expect(readme).toContain('Cloudflare Agent Memory is a separate private-beta Cloudflare product');
   });
