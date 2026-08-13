@@ -25,6 +25,19 @@ MemHeaven is for people who want:
 - continuity for coding agents and other AI workflows across sessions
 - a remote MCP deployment shape instead of a laptop-only setup
 
+## When MemHeaven fits
+
+Choose MemHeaven when a hosted client or AI agent needs a searchable memory layer that persists outside the current chat:
+
+- ChatGPT needs to retrieve project decisions, preferences, notes, or other durable context across chats.
+- A remote MCP client cannot depend on a memory service running only on your laptop.
+- Separate users or workflows need tenant-scoped access to stored context.
+- You want to inspect, search, and delete the records held by your own deployment.
+
+## External memory, not a replacement for ChatGPT memory
+
+MemHeaven does not change ChatGPT's built-in memory. It is a separate OAuth-protected MCP service that your client can call for context stored in your own deployment. There is no shared public MemHeaven instance: you operate the Worker, storage bindings, OAuth configuration, and access keys in your Cloudflare account.
+
 ## ChatGPT long-term memory over remote MCP
 
 If you want ChatGPT to use a searchable memory layer across chats without putting that memory in a shared third-party service, deploy MemHeaven in your own Cloudflare account and connect ChatGPT to your instance's `/mcp` endpoint. This external memory complements ChatGPT's built-in memory: you can inspect, search, and delete the records stored by your own deployment. See the [ChatGPT setup](#chatgpt-setup) and [security model](docs/SECURITY.md) before connecting a client.

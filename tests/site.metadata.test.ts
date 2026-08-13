@@ -69,8 +69,15 @@ describe('static landing-page discovery metadata', () => {
     });
     expect(html).toContain('Self-hosted ChatGPT memory over remote MCP');
     expect(html).toContain('<h2>ChatGPT long-term memory, under your control</h2>');
+    expect(html).toContain('<h1>Self-hosted long-term memory for ChatGPT and AI agents</h1>');
     expect(html).toContain('How does this give ChatGPT durable memory?');
     expect(html).toContain("MemHeaven is a separate, inspectable memory layer that you deploy and control.");
+    expect(html).toContain('<h2>When MemHeaven fits</h2>');
+    expect(html).toContain('<h2>External memory, not a replacement for ChatGPT memory</h2>');
+    expect(html).toContain('There is no shared public MemHeaven instance.');
+    expect(html).toContain('MemHeaven is open source.');
+    expect(html).toContain('GitHub repository contains the source and deployment docs.');
+    expect(html).not.toContain('Static landing-page scaffold for MemHeaven.');
     expect(html).toContain('https://github.com/nazar256/memheaven#chatgpt-setup');
   });
 
@@ -87,5 +94,13 @@ describe('static landing-page discovery metadata', () => {
     expect((sitemap.match(/<url>/g) ?? []).length).toBe(1);
     expect((sitemap.match(/<loc>/g) ?? []).length).toBe(1);
     expect(sitemap).toContain(`<loc>${canonicalUrl}</loc>`);
+  });
+
+  it('allows crawling and advertises the canonical sitemap', () => {
+    const robots = readSiteFile('robots.txt');
+
+    expect(robots).toBe(
+      'User-agent: *\nAllow: /\nSitemap: https://nazar256.github.io/memheaven/sitemap.xml\n',
+    );
   });
 });

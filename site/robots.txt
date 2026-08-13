@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://nazar256.github.io/memheaven/sitemap.xml
