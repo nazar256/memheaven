@@ -37,7 +37,7 @@ Compare rank and presence against the retained baseline; do not replace the fixe
 
 ## Current evidence and work
 
-- Draft PR [#8](https://github.com/nazar256/memheaven/pull/8) contains the intent-clarity landing-page/README changes, the explicit external-memory boundary, the factual footer, and regression coverage. The proposed project-site `robots.txt` was removed after review showed that a GitHub Pages project site cannot publish the file at the origin root where crawlers look for it.
+- Merged PR [#8](https://github.com/nazar256/memheaven/pull/8) contains the intent-clarity landing-page/README changes, the explicit external-memory boundary, the factual footer, and regression coverage. The proposed project-site `robots.txt` was removed after review showed that a GitHub Pages project site cannot publish the file at the origin root where crawlers look for it.
 - The sanitized ordered baseline manifest is tracked at [`docs/DISCOVERABILITY_BASELINE_2026-08-12.json`](DISCOVERABILITY_BASELINE_2026-08-12.json). It records the ten queries, exact timestamp, unauthenticated/public method, locale limitation, and all first-ten result titles/URLs.
 - Search Console property `https://nazar256.github.io/memheaven/` is verified. The sitemap was submitted but initially reported `Could not read sitemap`. URL Inspection reported `URL is not on Google` / `Unknown to Google`; one authenticated indexing request was accepted into Google's priority crawl queue. These are process signals, not evidence of indexing or ranking.
 - The repository already has major catalog/distribution coverage. New generic directory submissions are frozen unless a specific surface demonstrates meaningful authority, relevant discovery audience, or an important missing ecosystem presence. “Free” or “accepts submissions” alone is not sufficient.
@@ -45,7 +45,7 @@ Compare rank and presence against the retained baseline; do not replace the fixe
 
 ## Next actions
 
-1. Complete PR #8 review and CI, then verify the public Pages deployment before starting the new measurement clock.
+1. PR #8 review, CI, merge, and Pages deployment are complete; use the recorded 24-hour, 72-hour, and 7-day checkpoints for the new measurement clock.
 2. Recheck Search Console sitemap, URL indexing, and query-impression reports after its processing interval.
 3. Run the three fixed-query manifests after deployment and retain their full ordered evidence.
 4. Monitor existing upstream review queues and the Official MCP Registry's stale `websiteUrl` field; do not create duplicate catalog records.
